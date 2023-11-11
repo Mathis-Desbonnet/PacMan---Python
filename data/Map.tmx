@@ -83,8 +83,8 @@
   <object id="54" type="collisionTPRight" x="241" y="104.182" width="4.90909" height="24"/>
   <object id="55" type="collisionTPLeft" x="-20.7879" y="103.909" width="4.90909" height="24"/>
  </objectgroup>
- <objectgroup id="3" name="CollisionHub" visible="0">
-  <object id="47" type="collision" x="88" y="104" width="48" height="24"/>
+ <objectgroup id="3" name="CollisionHub">
+  <object id="47" type="collisionHub" x="88" y="104" width="48" height="24"/>
  </objectgroup>
  <objectgroup id="4" name="Gomme">
   <object id="63" type="gomme" x="8" y="8" width="8" height="8"/>
