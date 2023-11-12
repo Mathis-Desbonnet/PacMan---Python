@@ -2,6 +2,7 @@ from math import sqrt, cos, sin, radians
 from time import sleep
 import pygame
 import pytmx
+import pyscroll
 from player import Pacman
 from item import Gomme
 from blinky import Blinky
@@ -686,12 +687,17 @@ class Debug:
 
 class Game:
     def __init__(self) -> None:
-        self.screen = pygame.display.set_mode((224, 248))
+        self.screen = pygame.display.set_mode((448, 496))
         self.clock = pygame.time.Clock()
 
         self.map = pytmx.load_pygame("./data/Map.tmx")
+        test = pyscroll.data.TiledMapData(self.map)
+        layer = pyscroll.orthographic.BufferedRenderer(test, self.screen.get_size())
+        layer.zoom = 2
         self.tmx_data = pytmx.util_pygame.load_pygame("./data/Map.tmx")
         self.background = self.map.layers[0]
+
+        self.group = pyscroll.PyscrollGroup(map_layer=layer)
 
         self.pacman = Pacman()
         self.pacmanLife = 0
@@ -714,6 +720,12 @@ class Game:
         self.clyde = Clyde(x=92, y=84)
         self.clydeLife = 0
         self.clydePossibleDirection = "Right"
+
+        self.group.add(self.blinky)
+        self.group.add(self.pinky)
+        self.group.add(self.inky)
+        self.group.add(self.clyde)
+        self.group.add(self.pacman)
 
         self.CollisionBox = pygame.Rect(self.pacman.rect.x, self.pacman.rect.y, 16, 16)
         self.scoreBox = pygame.Rect(
@@ -753,6 +765,8 @@ class Game:
 
         for gomme in self.gommeSpawn:
             self.gommes.append(Gomme(x=gomme.x, y=gomme.y))
+            self.group.add(Gomme(x=gomme.x, y=gomme.y))
+
 
     def checkCollision(self):
         ifCollision = False
@@ -825,13 +839,16 @@ class Game:
     def addScore(self):
         for gomme in self.gommeSpawn:
             if self.scoreBox.colliderect(gomme):
-                for gommeOnScreen in self.gommes:
+                for gommeOnScreen in self.group.sprites():
                     if (
                         gommeOnScreen.rect.x == gomme.x
                         and gommeOnScreen.rect.y == gomme.y
                     ):
-                        self.gommes.remove(gommeOnScreen)
+                        self.group.remove(gommeOnScreen)
+                        self.group.update()
                         self.score += gommeOnScreen.score
+        self.group.update()
+        self.group.draw(self.screen)
 
     def blinkyMovement(self):
         if self.blinkyLife <= 2:
@@ -1290,15 +1307,16 @@ class Game:
                 self.clydeLife = 0
 
     def updateScreen(self):
-        for layer in self.map.visible_layers:
-            if layer.name == "Background":
-                for x, y, gid in layer:
-                    tile = self.map.get_tile_image_by_gid(gid)
-                    self.screen.blit(
-                        tile, (x * self.map.tilewidth, y * self.map.tileheight)
-                    )
+        # for layer in self.map.visible_layers:
+        #     if layer.name == "Background":
+        #         for x, y, gid in layer:
+        #             tile = self.map.get_tile_image_by_gid(gid)
+        #             self.screen.blit(
+        #                 tile, (x * self.map.tilewidth, y * self.map.tileheight)
+        #             )
 
         # pygame.draw.rect(self.screen, (255, 0, 0), self.CollisionBox, 1)
+        self.pacman.image = self.pacman.animation(self.pacmanWay)[self.pacmanLife % 3]
         self.screen.blit(self.pacman.animation(self.pacmanWay)[self.pacmanLife % 3], self.pacman.getPos())
 
         #pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.rect, 1)
@@ -1329,6 +1347,9 @@ class Game:
 
         for gomme in self.gommes:
             self.screen.blit(gomme.image, (gomme.rect.x, gomme.rect.y))
+
+        self.group.update()
+        self.group.draw(self.screen)
 
         pygame.display.update()
 
