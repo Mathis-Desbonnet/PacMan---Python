@@ -9,11 +9,14 @@ class Blinky(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.collisionBox = pygame.Rect(self.rect.x, self.rect.y, 16, 16)
-        self.okMovement = ["Left", "Right", "Up"]
+        self.allMovement = ["Right", "Down", "Left", "Up"]
+        self.okMovement = ["Right", "Left", "Up"]
 
     def setPos(self, x, y):
         self.rect.x = x
         self.rect.y = y
+        self.collisionBox.x = x
+        self.collisionBox.y = y
 
     def getPos(self):
         return (self.rect.x, self.rect.y)
@@ -21,6 +24,8 @@ class Blinky(pygame.sprite.Sprite):
     def move(self, x, y):
         self.rect.x += x
         self.rect.y += y
+        self.collisionBox.x += x
+        self.collisionBox.y += y
 
     def moveCollisionBox(self, x, y):
         self.collisionBox.x += x

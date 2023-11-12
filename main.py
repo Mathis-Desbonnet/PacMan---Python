@@ -1,3 +1,5 @@
+from math import sqrt
+from time import sleep
 import pygame
 import pytmx
 from player import Pacman
@@ -6,7 +8,8 @@ from blinky import Blinky
 
 pygame.init()
 
-class Game():
+
+class Game:
     def __init__(self) -> None:
         self.screen = pygame.display.set_mode((224, 248))
         self.clock = pygame.time.Clock()
@@ -16,13 +19,17 @@ class Game():
         self.background = self.map.layers[0]
 
         self.pacman = Pacman()
-        self.blinky = Blinky(x=104, y=108)
+        self.pacmanLife = 0
+        self.pacmanWay = "Right"
 
+        self.blinky = Blinky(x=108, y=108)
         self.blinkyLife = 0
         self.blinkyPossibleDirection = "Up"
 
         self.CollisionBox = pygame.Rect(self.pacman.rect.x, self.pacman.rect.y, 16, 16)
-        self.scoreBox = pygame.Rect(self.pacman.rect.x+4, self.pacman.rect.y+4, 8, 8)
+        self.scoreBox = pygame.Rect(
+            self.pacman.rect.x + 4, self.pacman.rect.y + 4, 8, 8
+        )
         self.running = True
         self.score = 0
 
@@ -30,6 +37,8 @@ class Game():
         self.collisionHub = None
         self.collisionTp = []
         self.gommeSpawn = []
+        self.ghostCollisionRight = None
+        self.ghostCollisionLeft = None
 
         for obj in self.tmx_data.objects:
             if obj.type == "collision":
@@ -37,11 +46,19 @@ class Game():
             elif obj.type == "collisionHub":
                 self.collisionHub = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
             elif obj.type == "collisionTPRight":
-                self.collisionTp.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                self.collisionTp.append(
+                    pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+                )
             elif obj.type == "collisionTPLeft":
-                self.collisionTp.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+                self.collisionTp.append(
+                    pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+                )
             elif obj.type == "gomme":
                 self.gommeSpawn.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+            elif obj.type == "collisionGhostRight":
+                self.ghostCollisionRight = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
+            elif obj.type == "collisionGhostLeft":
+                self.ghostCollisionLeft = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
 
         self.gommes = []
 
@@ -51,25 +68,28 @@ class Game():
     def checkCollision(self):
         ifCollision = False
         for collision in self.collisions:
-                if self.CollisionBox.colliderect(collision) or self.CollisionBox.colliderect(self.collisionHub):
-                    ifCollision = True
-        
+            if self.CollisionBox.colliderect(
+                collision
+            ) or self.CollisionBox.colliderect(self.collisionHub):
+                ifCollision = True
+
         return ifCollision
-    
+
     def checkTp(self, x, y, xCollision):
         for collision in self.collisionTp:
             if self.CollisionBox.colliderect(collision):
                 self.pacman.setPos(x, y)
                 self.CollisionBox.x = xCollision
                 self.CollisionBox.y = y
-                self.scoreBox.x = x+4
-                self.scoreBox.y = y+4
+                self.scoreBox.x = x + 4
+                self.scoreBox.y = y + 4
 
     def input(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_z]:
             self.CollisionBox.y -= 8
+            self.pacmanWay = "Up"
             if not self.checkCollision():
                 self.pacman.move(0, -8)
                 self.scoreBox.y -= 8
@@ -78,6 +98,7 @@ class Game():
 
         if keys[pygame.K_q]:
             self.CollisionBox.x -= 8
+            self.pacmanWay = "Left"
             self.checkTp(228, 108, 220)
             if not self.checkCollision():
                 self.pacman.move(-8, 0)
@@ -87,6 +108,7 @@ class Game():
 
         if keys[pygame.K_s]:
             self.CollisionBox.y += 8
+            self.pacmanWay = "Down"
             if not self.checkCollision():
                 self.pacman.move(0, 8)
                 self.scoreBox.y += 8
@@ -95,6 +117,7 @@ class Game():
 
         if keys[pygame.K_d]:
             self.CollisionBox.x += 8
+            self.pacmanWay = "Right"
             self.checkTp(-20, 108, -12)
             if not self.checkCollision():
                 self.pacman.move(8, 0)
@@ -106,25 +129,122 @@ class Game():
         for gomme in self.gommeSpawn:
             if self.scoreBox.colliderect(gomme):
                 for gommeOnScreen in self.gommes:
-                    if gommeOnScreen.rect.x == gomme.x and gommeOnScreen.rect.y == gomme.y:
+                    if (
+                        gommeOnScreen.rect.x == gomme.x
+                        and gommeOnScreen.rect.y == gomme.y
+                    ):
                         self.gommes.remove(gommeOnScreen)
                         self.score += gommeOnScreen.score
 
+    def blinkyMovement(self):
+        if self.blinkyLife <= 2:
+            self.blinky.move(0, -8)
+        else:
+            min = 1000000000000000000000
+            for i in self.blinky.okMovement:
+                plusPetit = True
+                if i == "Right":
+                    self.blinky.moveCollisionBox(8, 0)
+                    self.blinkyDistance = sqrt(
+                        (self.blinky.collisionBox.x - self.pacman.rect.x) ** 2
+                        + (self.blinky.collisionBox.y - self.pacman.rect.y) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.blinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.blinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.blinkyDistance <= min and plusPetit:
+                        min = self.blinkyDistance
+                        self.blinkyPossibleDirection = "Right"
+                    self.blinky.moveCollisionBox(-8, 0)
+                elif i == "Down":
+                    self.blinky.moveCollisionBox(0, 8)
+                    self.blinkyDistance = sqrt(
+                        (self.blinky.collisionBox.x - self.pacman.rect.x) ** 2
+                        + (self.blinky.collisionBox.y - self.pacman.rect.y) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.blinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.blinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.blinkyDistance <= min and plusPetit:
+                        min = self.blinkyDistance
+                        self.blinkyPossibleDirection = "Down"
+                    self.blinky.moveCollisionBox(0, -8)
+                elif i == "Left":
+                    self.blinky.moveCollisionBox(-8, 0)
+                    self.blinkyDistance = sqrt(
+                        (self.blinky.collisionBox.x - self.pacman.rect.x) ** 2
+                        + (self.blinky.collisionBox.y - self.pacman.rect.y) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.blinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.blinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.blinkyDistance <= min and plusPetit:
+                        min = self.blinkyDistance
+                        self.blinkyPossibleDirection = "Left"
+                    self.blinky.moveCollisionBox(8, 0)
+                elif i == "Up":
+                    self.blinky.moveCollisionBox(0, -8)
+                    self.blinkyDistance = sqrt(
+                        (self.blinky.collisionBox.x - self.pacman.rect.x) ** 2
+                        + (self.blinky.collisionBox.y - self.pacman.rect.y) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.blinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.blinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.blinkyDistance <= min and plusPetit:
+                        min = self.blinkyDistance
+                        self.blinkyPossibleDirection = "Up"
+                    self.blinky.moveCollisionBox(0, 8)
+
+            if self.blinkyLife <= 7:
+                if self.blinkyPossibleDirection == "Right":
+                    if self.blinky.collisionBox.colliderect(self.ghostCollisionRight):
+                        self.blinky.setPos(-20, 108)
+                    self.blinky.move(8, 0)
+                    self.blinky.okMovement = (
+                        self.blinky.allMovement.copy()[0:2]
+                        + self.blinky.allMovement.copy()[3:4]
+                    )
+                elif self.blinkyPossibleDirection == "Down":
+                    self.blinky.move(0, 8)
+                    self.blinky.okMovement = self.blinky.allMovement.copy()[:3]
+                elif self.blinkyPossibleDirection == "Left":
+                    if self.blinky.collisionBox.colliderect(self.ghostCollisionLeft):
+                        self.blinky.setPos(228, 108)
+                    self.blinky.move(-8, 0)
+                    self.blinky.okMovement = self.blinky.allMovement.copy()[1:]
+                elif self.blinkyPossibleDirection == "Up":
+                    self.blinky.move(0, -8)
+                    self.blinky.okMovement = (
+                        self.blinky.allMovement.copy()[0:1]
+                        + self.blinky.allMovement.copy()[2:4]
+                    )
+            else:
+                self.blinkyLife = 3
+
     def updateScreen(self):
         for layer in self.map.visible_layers:
-                if layer.name == "Background":
-                    for x, y, gid in layer:
-                        tile = self.map.get_tile_image_by_gid(gid)
-                        self.screen.blit(tile, (x * self.map.tilewidth, y * self.map.tileheight))
-        
-        
-        pygame.draw.rect(self.screen, (255, 0, 0), self.CollisionBox, 1)
-        pygame.draw.rect(self.screen, (0, 255, 0), self.scoreBox, 1)
-        self.screen.blit(self.pacman.image, self.pacman.getPos())
+            if layer.name == "Background":
+                for x, y, gid in layer:
+                    tile = self.map.get_tile_image_by_gid(gid)
+                    self.screen.blit(
+                        tile, (x * self.map.tilewidth, y * self.map.tileheight)
+                    )
 
-        pygame.draw.rect(self.screen, (0, 0, 255), self.blinky.rect, 1)
+        # pygame.draw.rect(self.screen, (255, 0, 0), self.CollisionBox, 1)
+        # pygame.draw.rect(self.screen, (0, 255, 0), self.scoreBox, 1)
+        self.screen.blit(self.pacman.animation(self.pacmanWay)[self.pacmanLife % 3], self.pacman.getPos())
+
+        # pygame.draw.rect(self.screen, (0, 0, 255), self.blinky.rect, 1)
         self.screen.blit(self.blinky.image, self.blinky.getPos())
-
 
         for gomme in self.gommes:
             self.screen.blit(gomme.image, (gomme.rect.x, gomme.rect.y))
@@ -140,20 +260,17 @@ class Game():
             self.input()
             self.addScore()
             self.updateScreen()
+            self.blinkyMovement()
 
-            if self.blinkyLife <= 2:
-                self.blinky.move(0, 8)
-                self.blinkyLife += 1
-            else:
-                for i in self.blinky.okMovement:
-                    if i == "Left":
-                        self.blinky.moveCollisionBox(0, -8)
-                        self.blinkyRelativePos = (self.blinky.collisionBox.x - self.pacman.rect.x, self.blinky.collisionBox.y - self.pacman.rect.y)
+            self.pacmanLife += 1
 
+            print(self.blinky.okMovement)
+            self.blinkyLife += 1
 
             print(self.score)
-                    
+
             self.clock.tick(10)
+
 
 if __name__ == "__main__":
     game = Game()
