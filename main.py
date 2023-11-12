@@ -5,6 +5,7 @@ import pytmx
 from player import Pacman
 from item import Gomme
 from blinky import Blinky
+from pinky import Pinky
 
 pygame.init()
 
@@ -21,10 +22,15 @@ class Game:
         self.pacman = Pacman()
         self.pacmanLife = 0
         self.pacmanWay = "Right"
+        self.pinkyDirectionAddition = (0, 32)
 
         self.blinky = Blinky(x=108, y=108)
         self.blinkyLife = 0
         self.blinkyPossibleDirection = "Up"
+
+        self.pinky = Pinky(x=92, y=108)
+        self.pinkyLife = 0
+        self.pinkyPossibleDirection = "Up"
 
         self.CollisionBox = pygame.Rect(self.pacman.rect.x, self.pacman.rect.y, 16, 16)
         self.scoreBox = pygame.Rect(
@@ -90,6 +96,7 @@ class Game:
         if keys[pygame.K_z]:
             self.CollisionBox.y -= 8
             self.pacmanWay = "Up"
+            self.pinkyDirectionAddition = (-32, -32)
             if not self.checkCollision():
                 self.pacman.move(0, -8)
                 self.scoreBox.y -= 8
@@ -99,6 +106,7 @@ class Game:
         if keys[pygame.K_q]:
             self.CollisionBox.x -= 8
             self.pacmanWay = "Left"
+            self.pinkyDirectionAddition = (-32, 0)
             self.checkTp(228, 108, 220)
             if not self.checkCollision():
                 self.pacman.move(-8, 0)
@@ -109,6 +117,7 @@ class Game:
         if keys[pygame.K_s]:
             self.CollisionBox.y += 8
             self.pacmanWay = "Down"
+            self.pinkyDirectionAddition = (0, 32)
             if not self.checkCollision():
                 self.pacman.move(0, 8)
                 self.scoreBox.y += 8
@@ -118,6 +127,7 @@ class Game:
         if keys[pygame.K_d]:
             self.CollisionBox.x += 8
             self.pacmanWay = "Right"
+            self.pinkyDirectionAddition = (32, 0)
             self.checkTp(-20, 108, -12)
             if not self.checkCollision():
                 self.pacman.move(8, 0)
@@ -230,6 +240,118 @@ class Game:
             else:
                 self.blinkyLife = 3
 
+    def pinkyMovement(self):
+        if self.pinkyLife == 0:
+            self.pinky.move(8, 0)
+        elif self.pinkyLife <= 3:
+            self.pinky.move(0, -8)
+        else:
+            min = 1000000000000000000000
+            for i in self.pinky.okMovement:
+                plusPetit = True
+                if i == "Right":
+                    self.pinky.moveCollisionBox(8, 0)
+                    self.pinkyDistance = sqrt(
+                        (self.pinky.collisionBox.x - (self.pacman.rect.x+self.pinkyDirectionAddition[0])) ** 2
+                        + (self.pinky.collisionBox.y - (self.pacman.rect.y+self.pinkyDirectionAddition[1])) ** 2
+                    )
+                    pygame.draw.rect(self.screen, (255, 0, 0), self.pinky.collisionBox, 1)
+                    pygame.display.flip()
+                    for collision in self.collisions:
+                        if self.pinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.pinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.pinkyDistance <= min and plusPetit:
+                        min = self.pinkyDistance
+                        self.pinkyPossibleDirection = "Right"
+                    self.pinky.moveCollisionBox(-8, 0)
+                elif i == "Down":
+                    self.pinky.moveCollisionBox(0, 8)
+                    pygame.draw.rect(self.screen, (255, 0, 0), self.pinky.collisionBox, 1)
+                    pygame.display.flip()
+                    self.pinkyDistance = sqrt(
+                        (self.pinky.collisionBox.x - (self.pacman.rect.x+self.pinkyDirectionAddition[0])) ** 2
+                        + (self.pinky.collisionBox.y - (self.pacman.rect.y+self.pinkyDirectionAddition[1])) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.pinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.pinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.pinkyDistance <= min and plusPetit:
+                        min = self.pinkyDistance
+                        self.pinkyPossibleDirection = "Down"
+                    self.pinky.moveCollisionBox(0, -8)
+                elif i == "Left":
+                    self.pinky.moveCollisionBox(-8, 0)
+                    pygame.draw.rect(self.screen, (255, 0, 0), self.pinky.collisionBox, 1)
+                    pygame.display.flip()
+                    self.pinkyDistance = sqrt(
+                        (self.pinky.collisionBox.x - (self.pacman.rect.x+self.pinkyDirectionAddition[0])) ** 2
+                        + (self.pinky.collisionBox.y - (self.pacman.rect.y+self.pinkyDirectionAddition[1])) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.pinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.pinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.pinkyDistance <= min and plusPetit:
+                        min = self.pinkyDistance
+                        self.pinkyPossibleDirection = "Left"
+                    self.pinky.moveCollisionBox(8, 0)
+                elif i == "Up":
+                    self.pinky.moveCollisionBox(0, -8)
+                    pygame.draw.rect(self.screen, (255, 0, 0), self.pinky.collisionBox, 1)
+                    pygame.display.flip()
+                    self.pinkyDistance = sqrt(
+                        (self.pinky.collisionBox.x - (self.pacman.rect.x+self.pinkyDirectionAddition[0])) ** 2
+                        + (self.pinky.collisionBox.y - (self.pacman.rect.y+self.pinkyDirectionAddition[1])) ** 2
+                    )
+                    for collision in self.collisions:
+                        if self.pinky.collisionBox.colliderect(
+                            self.collisionHub
+                        ) or self.pinky.collisionBox.colliderect(collision):
+                            plusPetit = False
+                    if self.pinkyDistance <= min and plusPetit:
+                        min = self.pinkyDistance
+                        self.pinkyPossibleDirection = "Up"
+                    self.pinky.moveCollisionBox(0, 8)
+                print(self.pinky.okMovement)
+                print(min)
+                print(self.pinkyDistance)
+                print(self.pinkyPossibleDirection)
+                print()
+                pygame.draw.rect(self.screen, (255, 0, 0), self.pinky.collisionBox, 1)
+                pygame.draw.rect(self.screen, (255, 0, 0), pygame.Rect(self.pacman.rect.x+self.pinkyDirectionAddition[0], self.pacman.rect.y+self.pinkyDirectionAddition[1], 16, 16), 1)
+                pygame.display.flip()
+
+            if self.pinkyLife <= 8:
+                if self.pinkyPossibleDirection == "Right":
+                    if self.pinky.collisionBox.colliderect(self.ghostCollisionRight):
+                        self.pinky.setPos(-20, 108)
+                    self.pinky.move(8, 0)
+                    self.pinky.okMovement = (
+                        self.pinky.allMovement.copy()[0:2]
+                        + self.pinky.allMovement.copy()[3:4]
+                    )
+                elif self.pinkyPossibleDirection == "Down":
+                    self.pinky.move(0, 8)
+                    self.pinky.okMovement = self.pinky.allMovement.copy()[:3]
+                elif self.pinkyPossibleDirection == "Left":
+                    if self.pinky.collisionBox.colliderect(self.ghostCollisionLeft):
+                        self.pinky.setPos(228, 108)
+                    self.pinky.move(-8, 0)
+                    self.pinky.okMovement = self.pinky.allMovement.copy()[1:]
+                elif self.pinkyPossibleDirection == "Up":
+                    self.pinky.move(0, -8)
+                    self.pinky.okMovement = (
+                        self.pinky.allMovement.copy()[0:1]
+                        + self.pinky.allMovement.copy()[2:4]
+                    )
+            else:
+                self.pinkyLife = 4
+
     def updateScreen(self):
         for layer in self.map.visible_layers:
             if layer.name == "Background":
@@ -246,6 +368,9 @@ class Game:
         # pygame.draw.rect(self.screen, (0, 0, 255), self.blinky.rect, 1)
         self.screen.blit(self.blinky.image, self.blinky.getPos())
 
+        pygame.draw.rect(self.screen, (0, 0, 255), self.pinky.rect, 1)
+        self.screen.blit(self.pinky.image, self.pinky.getPos())
+
         for gomme in self.gommes:
             self.screen.blit(gomme.image, (gomme.rect.x, gomme.rect.y))
 
@@ -261,13 +386,12 @@ class Game:
             self.addScore()
             self.updateScreen()
             self.blinkyMovement()
+            self.pinkyMovement()
 
             self.pacmanLife += 1
-
-            print(self.blinky.okMovement)
             self.blinkyLife += 1
 
-            print(self.score)
+            self.pinkyLife += 1
 
             self.clock.tick(10)
 
