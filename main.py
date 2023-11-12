@@ -4,7 +4,7 @@ import pygame
 import pytmx
 import pyscroll
 from player import Pacman
-from item import Gomme
+from item import Gomme, GommePlus
 from blinky import Blinky
 from pinky import Pinky
 from inky import Inky
@@ -699,6 +699,9 @@ class Game:
 
         self.group = pyscroll.PyscrollGroup(map_layer=layer)
 
+        self.gameState = "Chase"
+        self.timeFright = 0
+
         self.pacman = Pacman()
         self.pacmanLife = 0
         self.pacmanWay = "Right"
@@ -738,6 +741,7 @@ class Game:
         self.collisionHub = None
         self.collisionTp = []
         self.gommeSpawn = []
+        self.gommePlusSpawn = []
         self.ghostCollisionRight = None
         self.ghostCollisionLeft = None
 
@@ -756,16 +760,23 @@ class Game:
                 )
             elif obj.type == "gomme":
                 self.gommeSpawn.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
+            elif obj.type == "gommePlus":
+                self.gommePlusSpawn.append(pygame.Rect(obj.x, obj.y, obj.width, obj.height))
             elif obj.type == "collisionGhostRight":
                 self.ghostCollisionRight = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
             elif obj.type == "collisionGhostLeft":
                 self.ghostCollisionLeft = pygame.Rect(obj.x, obj.y, obj.width, obj.height)
 
         self.gommes = []
+        self.gommesPlus = []
 
         for gomme in self.gommeSpawn:
             self.gommes.append(Gomme(x=gomme.x, y=gomme.y))
             self.group.add(Gomme(x=gomme.x, y=gomme.y))
+
+        for gomme in self.gommePlusSpawn:
+            self.gommesPlus.append(GommePlus(x=gomme.x, y=gomme.y))
+            self.group.add(GommePlus(x=gomme.x, y=gomme.y))
 
 
     def checkCollision(self):
@@ -835,6 +846,20 @@ class Game:
                 self.scoreBox.x += 8
             else:
                 self.CollisionBox.x -= 8
+
+    def setState(self):
+        for gomme in self.gommePlusSpawn:
+            if self.scoreBox.colliderect(gomme):
+                for gommeOnScreen in self.group.sprites():
+                    if (
+                        gommeOnScreen.rect.x == gomme.x
+                        and gommeOnScreen.rect.y == gomme.y
+                    ):
+                        self.group.remove(gommeOnScreen)
+                        self.group.update()
+                        self.gameState = "Fright"
+                        self.timeFright = 60
+        self.group.draw(self.screen)
 
     def addScore(self):
         for gomme in self.gommeSpawn:
@@ -1362,17 +1387,28 @@ class Game:
             self.input()
             self.addScore()
             self.updateScreen()
+            self.setState()
 
-            self.blinkyMovement()
-            self.pinkyMovement()
-            self.inkyMovement()
-            self.clydeMovement()
+            if self.gameState == "Chase":
+                self.blinkyMovement()
+                self.pinkyMovement()
+                self.inkyMovement()
+                self.clydeMovement()
+            elif self.gameState == "Fright":
+
 
             self.pacmanLife += 1
             self.blinkyLife += 1
             self.pinkyLife += 1
             self.inkyLife += 1
             self.clydeLife += 1
+
+            if self.timeFright == 0:
+                self.gameState = "Chase"
+            else:
+                self.timeFright -= 1
+
+            print(self.gameState)
 
             self.clock.tick(10)
 
