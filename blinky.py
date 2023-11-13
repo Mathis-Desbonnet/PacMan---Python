@@ -5,6 +5,7 @@ class Blinky(pygame.sprite.Sprite):
     def __init__(self, *groups: AbstractGroup, x, y) -> None:
         super().__init__(*groups)
         self.image = pygame.image.load("./data/PacManSprites.png").convert_alpha().subsurface((3, 64, 16, 16))
+        self.imageBackup = self.image
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
