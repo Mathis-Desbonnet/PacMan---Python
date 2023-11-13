@@ -99,7 +99,7 @@
   <object id="70" type="gomme" x="64" y="8" width="8" height="8"/>
   <object id="71" type="gomme" x="72" y="8" width="8" height="8"/>
   <object id="72" type="gomme" x="80" y="8" width="8" height="8"/>
-  <object id="73" type="gomme" x="8" y="16" width="8" height="8"/>
+  <object id="73" type="gommePlus" x="8" y="16" width="8" height="8"/>
   <object id="74" type="gomme" x="8" y="24" width="8" height="8"/>
   <object id="75" type="gomme" x="8" y="32" width="8" height="8"/>
   <object id="76" type="gomme" x="8" y="40" width="8" height="8"/>
@@ -145,7 +145,7 @@
   <object id="126" type="gomme" x="200" y="40" width="8" height="8"/>
   <object id="127" type="gomme" x="208" y="40" width="8" height="8"/>
   <object id="128" type="gomme" x="208" y="24" width="8" height="8"/>
-  <object id="129" type="gomme" x="208" y="16" width="8" height="8"/>
+  <object id="129" type="gommePlus" x="208" y="16" width="8" height="8"/>
   <object id="130" type="gomme" x="208" y="48" width="8" height="8"/>
   <object id="131" type="gomme" x="208" y="64" width="8" height="8"/>
   <object id="132" type="gomme" x="184" y="40" width="8" height="8"/>
@@ -193,7 +193,6 @@
   <object id="180" type="gomme" x="72" y="56" width="8" height="8"/>
   <object id="181" type="gomme" x="72" y="64" width="8" height="8"/>
   <object id="182" type="gomme" x="96" y="64" width="8" height="8"/>
-  <object id="183" type="gomme" x="96" y="72" width="8" height="8"/>
   <object id="184" type="gomme" x="80" y="64" width="8" height="8"/>
   <object id="185" type="gomme" x="144" y="48" width="8" height="8"/>
   <object id="186" type="gomme" x="144" y="56" width="8" height="8"/>
@@ -234,53 +233,12 @@
   <object id="221" type="gomme" x="8" y="112" width="8" height="8"/>
   <object id="222" type="gomme" x="0" y="112" width="8" height="8"/>
   <object id="224" type="gomme" x="88" y="64" width="8" height="8"/>
-  <object id="225" type="gomme" x="96" y="80" width="8" height="8"/>
-  <object id="226" type="gomme" x="96" y="88" width="8" height="8"/>
-  <object id="227" type="gomme" x="88" y="88" width="8" height="8"/>
-  <object id="228" type="gomme" x="80" y="88" width="8" height="8"/>
-  <object id="229" type="gomme" x="72" y="88" width="8" height="8"/>
-  <object id="230" type="gomme" x="104" y="88" width="8" height="8"/>
-  <object id="231" type="gomme" x="112" y="88" width="8" height="8"/>
-  <object id="232" type="gomme" x="120" y="88" width="8" height="8"/>
-  <object id="233" type="gomme" x="128" y="88" width="8" height="8"/>
-  <object id="234" type="gomme" x="136" y="88" width="8" height="8"/>
-  <object id="235" type="gomme" x="144" y="88" width="8" height="8"/>
-  <object id="236" type="gomme" x="120" y="72" width="8" height="8"/>
-  <object id="237" type="gomme" x="120" y="80" width="8" height="8"/>
   <object id="238" type="gomme" x="176" y="64" width="8" height="8"/>
   <object id="239" type="gomme" x="184" y="64" width="8" height="8"/>
   <object id="240" type="gomme" x="192" y="64" width="8" height="8"/>
   <object id="241" type="gomme" x="200" y="64" width="8" height="8"/>
-  <object id="242" type="gomme" x="144" y="112" width="8" height="8"/>
-  <object id="243" type="gomme" x="144" y="96" width="8" height="8"/>
-  <object id="244" type="gomme" x="144" y="104" width="8" height="8"/>
-  <object id="245" type="gomme" x="144" y="120" width="8" height="8"/>
-  <object id="246" type="gomme" x="144" y="128" width="8" height="8"/>
-  <object id="247" type="gomme" x="144" y="136" width="8" height="8"/>
-  <object id="248" type="gomme" x="144" y="144" width="8" height="8"/>
-  <object id="249" type="gomme" x="144" y="152" width="8" height="8"/>
   <object id="250" type="gomme" x="144" y="160" width="8" height="8"/>
-  <object id="261" type="gomme" x="72" y="112" width="8" height="8"/>
-  <object id="262" type="gomme" x="72" y="96" width="8" height="8"/>
-  <object id="263" type="gomme" x="72" y="104" width="8" height="8"/>
-  <object id="264" type="gomme" x="72" y="120" width="8" height="8"/>
-  <object id="265" type="gomme" x="72" y="128" width="8" height="8"/>
-  <object id="266" type="gomme" x="72" y="136" width="8" height="8"/>
-  <object id="267" type="gomme" x="72" y="144" width="8" height="8"/>
-  <object id="268" type="gomme" x="72" y="152" width="8" height="8"/>
   <object id="269" type="gomme" x="72" y="160" width="8" height="8"/>
-  <object id="271" type="gomme" x="56" y="112" width="8" height="8"/>
-  <object id="272" type="gomme" x="64" y="112" width="8" height="8"/>
-  <object id="273" type="gomme" x="152" y="112" width="8" height="8"/>
-  <object id="274" type="gomme" x="160" y="112" width="8" height="8"/>
-  <object id="275" type="gomme" x="80" y="136" width="8" height="8"/>
-  <object id="276" type="gomme" x="88" y="136" width="8" height="8"/>
-  <object id="277" type="gomme" x="96" y="136" width="8" height="8"/>
-  <object id="278" type="gomme" x="104" y="136" width="8" height="8"/>
-  <object id="279" type="gomme" x="112" y="136" width="8" height="8"/>
-  <object id="280" type="gomme" x="120" y="136" width="8" height="8"/>
-  <object id="281" type="gomme" x="128" y="136" width="8" height="8"/>
-  <object id="282" type="gomme" x="136" y="136" width="8" height="8"/>
   <object id="283" type="gomme" x="80" y="160" width="8" height="8"/>
   <object id="284" type="gomme" x="88" y="160" width="8" height="8"/>
   <object id="285" type="gomme" x="96" y="160" width="8" height="8"/>
@@ -331,7 +289,7 @@
   <object id="331" type="gomme" x="120" y="208" width="8" height="8"/>
   <object id="332" type="gomme" x="8" y="168" width="8" height="8"/>
   <object id="333" type="gomme" x="8" y="176" width="8" height="8"/>
-  <object id="334" type="gomme" x="8" y="184" width="8" height="8"/>
+  <object id="334" type="gommePlus" x="8" y="184" width="8" height="8"/>
   <object id="335" type="gomme" x="16" y="184" width="8" height="8"/>
   <object id="336" type="gomme" x="24" y="184" width="8" height="8"/>
   <object id="338" type="gomme" x="24" y="192" width="8" height="8"/>
@@ -359,7 +317,7 @@
   <object id="360" type="gomme" x="56" y="232" width="8" height="8"/>
   <object id="362" type="gomme" x="208" y="168" width="8" height="8"/>
   <object id="363" type="gomme" x="208" y="176" width="8" height="8"/>
-  <object id="364" type="gomme" x="208" y="184" width="8" height="8"/>
+  <object id="364" type="gommePlus" x="208" y="184" width="8" height="8"/>
   <object id="365" type="gomme" x="200" y="184" width="8" height="8"/>
   <object id="366" type="gomme" x="192" y="184" width="8" height="8"/>
   <object id="367" type="gomme" x="192" y="192" width="8" height="8"/>
