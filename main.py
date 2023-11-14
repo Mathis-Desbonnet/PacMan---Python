@@ -335,6 +335,32 @@ class Game:
                             self.blinkyPossibleDirection = "Up"
                         self.blinky.moveCollisionBox(0, 8)
             elif self.gameState == "Fright":
+                if self.blinky.firstFright:
+                    for i in self.blinky.allMovement:
+                        if i not in self.blinky.okMovement:
+                            if i == "Right":
+                                self.blinky.move(8, 0)
+                                self.blinky.okMovement = (
+                                    self.blinky.allMovement.copy()[:2]
+                                    + self.blinky.allMovement.copy()[3:4]
+                                )
+                            elif i == "Down":
+                                self.blinky.move(0, 8)
+                                self.blinky.okMovement = self.blinky.allMovement.copy()[
+                                    :3
+                                ]
+                            elif i == "Left":
+                                self.blinky.move(-8, 0)
+                                self.blinky.okMovement = self.blinky.allMovement.copy()[
+                                    1:4
+                                ]
+                            elif i == "Up":
+                                self.blinky.move(0, -8)
+                                self.blinky.okMovement = (
+                                    self.blinky.allMovement.copy()[:1]
+                                    + self.blinky.allMovement.copy()[2:4]
+                                )
+                self.blinky.firstFright = False
                 listValidMove = self.blinky.okMovement.copy()
                 print(listValidMove)
                 print(self.blinky.okMovement)
@@ -596,6 +622,32 @@ class Game:
                         self.pinky.moveCollisionBox(0, 8)
 
             elif self.gameState == "Fright":
+                if self.pinky.firstFright:
+                    for i in self.pinky.allMovement:
+                        if i not in self.pinky.okMovement:
+                            if i == "Right":
+                                self.pinky.move(8, 0)
+                                self.pinky.okMovement = (
+                                    self.pinky.allMovement.copy()[:2]
+                                    + self.pinky.allMovement.copy()[3:4]
+                                )
+                            elif i == "Down":
+                                self.pinky.move(0, 8)
+                                self.pinky.okMovement = self.pinky.allMovement.copy()[
+                                    :3
+                                ]
+                            elif i == "Left":
+                                self.pinky.move(-8, 0)
+                                self.pinky.okMovement = self.pinky.allMovement.copy()[
+                                    1:4
+                                ]
+                            elif i == "Up":
+                                self.pinky.move(0, -8)
+                                self.pinky.okMovement = (
+                                    self.pinky.allMovement.copy()[:1]
+                                    + self.pinky.allMovement.copy()[2:4]
+                                )
+                self.pinky.firstFright = False
                 listValidMove = self.pinky.okMovement.copy()
                 print(listValidMove)
                 print(self.pinky.okMovement)
@@ -794,6 +846,28 @@ class Game:
                     print(self.inkyPossibleDirection)
                     print()
             elif self.gameState == "Fright":
+                if self.inky.firstFright:
+                    for i in self.inky.allMovement:
+                        if i not in self.inky.okMovement:
+                            if i == "Right":
+                                self.inky.move(8, 0)
+                                self.inky.okMovement = (
+                                    self.inky.allMovement.copy()[:2]
+                                    + self.inky.allMovement.copy()[3:4]
+                                )
+                            elif i == "Down":
+                                self.inky.move(0, 8)
+                                self.inky.okMovement = self.inky.allMovement.copy()[:3]
+                            elif i == "Left":
+                                self.inky.move(-8, 0)
+                                self.inky.okMovement = self.inky.allMovement.copy()[1:4]
+                            elif i == "Up":
+                                self.inky.move(0, -8)
+                                self.inky.okMovement = (
+                                    self.inky.allMovement.copy()[:1]
+                                    + self.inky.allMovement.copy()[2:4]
+                                )
+                self.inky.firstFright = False
                 listValidMove = self.inky.okMovement.copy()
                 print(listValidMove)
                 print(self.inky.okMovement)
@@ -1033,6 +1107,32 @@ class Game:
                         # print()
                         self.clyde.moveCollisionBox(0, 8)
             elif self.gameState == "Fright":
+                if self.clyde.firstFright:
+                    for i in self.clyde.allMovement:
+                        if i not in self.clyde.okMovement:
+                            if i == "Right":
+                                self.clyde.move(8, 0)
+                                self.clyde.okMovement = (
+                                    self.clyde.allMovement.copy()[:2]
+                                    + self.clyde.allMovement.copy()[3:4]
+                                )
+                            elif i == "Down":
+                                self.clyde.move(0, 8)
+                                self.clyde.okMovement = self.clyde.allMovement.copy()[
+                                    :3
+                                ]
+                            elif i == "Left":
+                                self.clyde.move(-8, 0)
+                                self.clyde.okMovement = self.clyde.allMovement.copy()[
+                                    1:4
+                                ]
+                            elif i == "Up":
+                                self.clyde.move(0, -8)
+                                self.clyde.okMovement = (
+                                    self.clyde.allMovement.copy()[:1]
+                                    + self.clyde.allMovement.copy()[2:4]
+                                )
+                self.clyde.firstFright = False
                 listValidMove = self.clyde.okMovement.copy()
                 print(listValidMove)
                 print(self.clyde.okMovement)
@@ -1215,6 +1315,10 @@ class Game:
 
             if self.timeFright == 0:
                 self.gameState = "Chase"
+                self.blinky.firstFright = True
+                self.pinky.firstFright = True
+                self.inky.firstFright = True
+                self.clyde.firstFright = True
             else:
                 self.timeFright -= 1
             self.clock.tick(10)

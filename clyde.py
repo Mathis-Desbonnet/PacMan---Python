@@ -16,6 +16,7 @@ class Clyde(pygame.sprite.Sprite):
         self.rect.y = y
         self.basePoint = (0, 248)
         self.isScatter = True
+        self.firstFright = True
         self.collisionBox = pygame.Rect(self.rect.x, self.rect.y, 16, 16)
         self.allMovement = ["Right", "Down", "Left", "Up"]
         self.okMovement = ["Right", "Left", "Up"]
