@@ -169,6 +169,15 @@ class Game:
                 self.clydeLife = 0
                 self.clydeCheck = 0
                 self.clydePossibleDirection = "Right"
+        else:
+            if self.scoreBox.colliderect(self.blinky.rect):
+                self.running = False
+            if self.scoreBox.colliderect(self.pinky.rect):
+                self.running = False
+            if self.scoreBox.colliderect(self.inky.rect):
+                self.running = False
+            if self.scoreBox.colliderect(self.clyde.rect):
+                self.running = False
 
     def input(self):
         #print("pacman x, y =", self.pacman.rect.x, self.pacman.rect.y)
