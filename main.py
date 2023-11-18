@@ -502,7 +502,7 @@ class Game:
                 if self.blinkyPossibleDirection == "Right":
                     self.blinky.move(1, 0)
                     if self.blinky.rect.colliderect(self.ghostCollisionRight):
-                        self.blinky.setPos(-3, 108)
+                        self.blinky.setPos(-19, 108)
                     self.blinky.okMovement = (
                         self.blinky.allMovement.copy()[0:2]
                         + self.blinky.allMovement.copy()[3:4]
@@ -513,7 +513,7 @@ class Game:
                 elif self.blinkyPossibleDirection == "Left":
                     self.blinky.move(-1, 0)
                     if self.blinky.collisionBox.colliderect(self.ghostCollisionLeft):
-                        self.blinky.setPos(211, 108)
+                        self.blinky.setPos(227, 108)
                     self.blinky.okMovement = self.blinky.allMovement.copy()[1:]
                 elif self.blinkyPossibleDirection == "Up":
                     self.blinky.move(0, -1)
@@ -770,7 +770,7 @@ class Game:
             if self.pinkyLife >= 32:
                 if self.pinkyPossibleDirection == "Right":
                     if self.pinky.collisionBox.colliderect(self.ghostCollisionRight):
-                        self.pinky.setPos(-3, 108)
+                        self.pinky.setPos(-19, 108)
                     self.pinky.move(1, 0)
                     self.pinky.okMovement = (
                         self.pinky.allMovement.copy()[0:2]
@@ -781,7 +781,7 @@ class Game:
                     self.pinky.okMovement = self.pinky.allMovement.copy()[:3]
                 elif self.pinkyPossibleDirection == "Left":
                     if self.pinky.collisionBox.colliderect(self.ghostCollisionLeft):
-                        self.pinky.setPos(211, 108)
+                        self.pinky.setPos(227, 108)
                     self.pinky.move(-1, 0)
                     self.pinky.okMovement = self.pinky.allMovement.copy()[1:]
                 elif self.pinkyPossibleDirection == "Up":
@@ -995,7 +995,7 @@ class Game:
             if self.inkyLife >= 0:
                 if self.inkyPossibleDirection == "Right":
                     if self.inky.collisionBox.colliderect(self.ghostCollisionRight):
-                        self.inky.setPos(-20, 108)
+                        self.inky.setPos(-19, 108)
                     self.inky.move(1, 0)
                     self.inky.okMovement = (
                         self.inky.allMovement.copy()[0:2]
@@ -1006,7 +1006,7 @@ class Game:
                     self.inky.okMovement = self.inky.allMovement.copy()[:3]
                 elif self.inkyPossibleDirection == "Left":
                     if self.inky.collisionBox.colliderect(self.ghostCollisionLeft):
-                        self.inky.setPos(228, 108)
+                        self.inky.setPos(227, 108)
                     self.inky.move(-1, 0)
                     self.inky.okMovement = self.inky.allMovement.copy()[1:]
                 elif self.inkyPossibleDirection == "Up":
@@ -1253,7 +1253,7 @@ class Game:
             if self.clydeLife >= 0:
                 if self.clydePossibleDirection == "Right":
                     if self.clyde.collisionBox.colliderect(self.ghostCollisionRight):
-                        self.clyde.setPos(-20, 108)
+                        self.clyde.setPos(-19, 108)
                     self.clyde.move(1, 0)
                     self.clyde.okMovement = (
                         self.clyde.allMovement.copy()[0:2]
@@ -1264,7 +1264,7 @@ class Game:
                     self.clyde.okMovement = self.clyde.allMovement.copy()[:3]
                 elif self.clydePossibleDirection == "Left":
                     if self.clyde.collisionBox.colliderect(self.ghostCollisionLeft):
-                        self.clyde.setPos(228, 108)
+                        self.clyde.setPos(227, 108)
                     self.clyde.move(-1, 0)
                     self.clyde.okMovement = self.clyde.allMovement.copy()[1:]
                 elif self.clydePossibleDirection == "Up":
