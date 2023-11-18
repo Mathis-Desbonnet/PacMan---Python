@@ -35,6 +35,8 @@ class Game:
             .convert_alpha()
             .subsurface((131, 64, 16, 16))
         )
+        
+        self.running = True
 
         self.pacman = Pacman()
         self.pacmanSpeed = 1
@@ -155,12 +157,18 @@ class Game:
             if self.pacman.rect.colliderect(self.pinky.rect):
                 self.pinky.setPos(92, 108)
                 self.pinkyLife = 0
+                self.pinkyCheck = 0
+                self.pinkyPossibleDirection = "Up"
             if self.pacman.rect.colliderect(self.inky.rect):
                 self.inky.setPos(108, 84)
                 self.inkyLife = 0
+                self.inkyCheck = 0
+                self.inkyPossibleDirection = "Right"
             if self.pacman.rect.colliderect(self.clyde.rect):
                 self.clyde.setPos(92, 84)
                 self.clydeLife = 0
+                self.clydeCheck = 0
+                self.clydePossibleDirection = "Right"
 
     def input(self):
         #print("pacman x, y =", self.pacman.rect.x, self.pacman.rect.y)
@@ -1345,11 +1353,11 @@ class Game:
 
         pygame.display.update()
 
-    def run(self, running) -> None:
-        while running:
+    def run(self) -> None:
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
 
             self.input()
             self.addScore()
@@ -1393,9 +1401,9 @@ class Game:
                 self.clyde.firstFright = True
             else:
                 self.timeFright -= 1
-            self.clock.tick(30)
+            self.clock.tick(60)
 
 
 if __name__ == "__main__":
     game = Game()
-    game.run(True)
+    game.run()
