@@ -58,10 +58,12 @@ class Game:
 
         self.inky = Inky(x=108, y=84)
         self.inkyLife = 0
+        self.inkyCheck = 0
         self.inkyPossibleDirection = "Right"
 
         self.clyde = Clyde(x=92, y=84)
         self.clydeLife = 0
+        self.clydeCheck = 0
         self.clydePossibleDirection = "Right"
 
         self.group.add(self.blinky)
@@ -783,24 +785,21 @@ class Game:
 
     def inkyMovement(self):
         if self.inkyLife >= 0:
-            if self.gameState == "Fright":
+            if self.gameState == "Fright" and self.inkyCheck >= 8:
+                self.inkyCheck = 0
                 if self.inky.firstFright:
                     for i in self.inky.allMovement:
                         if i not in self.inky.okMovement:
                             if i == "Right":
-                                self.inky.move(8, 0)
                                 self.inky.okMovement = (
                                     self.inky.allMovement.copy()[:2]
                                     + self.inky.allMovement.copy()[3:4]
                                 )
                             elif i == "Down":
-                                self.inky.move(0, 8)
                                 self.inky.okMovement = self.inky.allMovement.copy()[:3]
                             elif i == "Left":
-                                self.inky.move(-8, 0)
                                 self.inky.okMovement = self.inky.allMovement.copy()[1:4]
                             elif i == "Up":
-                                self.inky.move(0, -8)
                                 self.inky.okMovement = (
                                     self.inky.allMovement.copy()[:1]
                                     + self.inky.allMovement.copy()[2:4]
@@ -814,7 +813,7 @@ class Game:
                     kill = False
                     # print(i)
                     if i == "Right":
-                        self.inky.moveCollisionBox(8, 0)
+                        self.inky.moveCollisionBox(1, 0)
                         for collision in self.collisions:
                             if self.inky.collisionBox.colliderect(
                                 collision
@@ -824,9 +823,9 @@ class Game:
                         if kill:
                             listValidMove.remove(i)
 
-                        self.inky.moveCollisionBox(-8, 0)
+                        self.inky.moveCollisionBox(-1, 0)
                     elif i == "Down":
-                        self.inky.moveCollisionBox(0, 8)
+                        self.inky.moveCollisionBox(0, 1)
                         for collision in self.collisions:
                             if self.inky.collisionBox.colliderect(
                                 collision
@@ -835,9 +834,9 @@ class Game:
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.inky.moveCollisionBox(0, -8)
+                        self.inky.moveCollisionBox(0, -1)
                     elif i == "Left":
-                        self.inky.moveCollisionBox(-8, 0)
+                        self.inky.moveCollisionBox(-1, 0)
                         for collision in self.collisions:
                             if self.inky.collisionBox.colliderect(
                                 collision
@@ -846,9 +845,9 @@ class Game:
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.inky.moveCollisionBox(8, 0)
+                        self.inky.moveCollisionBox(1, 0)
                     elif i == "Up":
-                        self.inky.moveCollisionBox(0, -8)
+                        self.inky.moveCollisionBox(0, -1)
                         for collision in self.collisions:
                             if self.inky.collisionBox.colliderect(
                                 collision
@@ -857,16 +856,17 @@ class Game:
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.inky.moveCollisionBox(0, 8)
+                        self.inky.moveCollisionBox(0, 1)
                 # print()
                 # print(listValidMove)
                 # print(self.inky.okMovement)
                 self.inkyPossibleDirection = random.choice(listValidMove)
                 # print(self.inkyPossibleDirection)
-                pygame.draw.rect(self.screen, (0, 255, 255), self.inky.collisionBox, 1)
+                # pygame.draw.rect(self.screen, (0, 255, 255), self.inky.collisionBox, 1)
 
-            elif self.gameState == "Chase" or self.inky.isScatter:
+            elif (self.gameState == "Chase" or self.inky.isScatter) and self.inkyCheck >= 8:
                 min = 1000000000000000000000
+                self.inkyCheck = 0
                 xDistance = self.blinky.getPos()[0] - (
                     self.pacman.rect.x + self.inkyDirectionAddition[0]
                 )
@@ -988,21 +988,21 @@ class Game:
                 if self.inkyPossibleDirection == "Right":
                     if self.inky.collisionBox.colliderect(self.ghostCollisionRight):
                         self.inky.setPos(-20, 108)
-                    self.inky.move(8, 0)
+                    self.inky.move(1, 0)
                     self.inky.okMovement = (
                         self.inky.allMovement.copy()[0:2]
                         + self.inky.allMovement.copy()[3:4]
                     )
                 elif self.inkyPossibleDirection == "Down":
-                    self.inky.move(0, 8)
+                    self.inky.move(0, 1)
                     self.inky.okMovement = self.inky.allMovement.copy()[:3]
                 elif self.inkyPossibleDirection == "Left":
                     if self.inky.collisionBox.colliderect(self.ghostCollisionLeft):
                         self.inky.setPos(228, 108)
-                    self.inky.move(-8, 0)
+                    self.inky.move(-1, 0)
                     self.inky.okMovement = self.inky.allMovement.copy()[1:]
                 elif self.inkyPossibleDirection == "Up":
-                    self.inky.move(0, -8)
+                    self.inky.move(0, -1)
                     self.inky.okMovement = (
                         self.inky.allMovement.copy()[0:1]
                         + self.inky.allMovement.copy()[2:4]
@@ -1011,28 +1011,25 @@ class Game:
     def clydeMovement(self):
         if self.clydeLife >= 0:
             min = 1000000000000000000000
-            if self.gameState == "Fright":
+            if self.gameState == "Fright" and self.clydeCheck >= 8:
+                self.clydeCheck = 0
                 if self.clyde.firstFright:
                     for i in self.clyde.allMovement:
                         if i not in self.clyde.okMovement:
                             if i == "Right":
-                                self.clyde.move(8, 0)
                                 self.clyde.okMovement = (
                                     self.clyde.allMovement.copy()[:2]
                                     + self.clyde.allMovement.copy()[3:4]
                                 )
                             elif i == "Down":
-                                self.clyde.move(0, 8)
                                 self.clyde.okMovement = self.clyde.allMovement.copy()[
                                     :3
                                 ]
                             elif i == "Left":
-                                self.clyde.move(-8, 0)
                                 self.clyde.okMovement = self.clyde.allMovement.copy()[
                                     1:4
                                 ]
                             elif i == "Up":
-                                self.clyde.move(0, -8)
                                 self.clyde.okMovement = (
                                     self.clyde.allMovement.copy()[:1]
                                     + self.clyde.allMovement.copy()[2:4]
@@ -1091,7 +1088,8 @@ class Game:
                         self.clyde.moveCollisionBox(0, 8)
                 self.clydePossibleDirection = random.choice(listValidMove)
 
-            elif self.gameState == "Chase" or self.clyde.isScatter:
+            elif (self.gameState == "Chase" or self.clyde.isScatter) and self.clydeCheck >= 8:
+                self.clydeCheck = 0
                 for i in self.clyde.okMovement:
                     plusPetit = True
                     if i == "Right":
@@ -1248,21 +1246,21 @@ class Game:
                 if self.clydePossibleDirection == "Right":
                     if self.clyde.collisionBox.colliderect(self.ghostCollisionRight):
                         self.clyde.setPos(-20, 108)
-                    self.clyde.move(8, 0)
+                    self.clyde.move(1, 0)
                     self.clyde.okMovement = (
                         self.clyde.allMovement.copy()[0:2]
                         + self.clyde.allMovement.copy()[3:4]
                     )
                 elif self.clydePossibleDirection == "Down":
-                    self.clyde.move(0, 8)
+                    self.clyde.move(0, 1)
                     self.clyde.okMovement = self.clyde.allMovement.copy()[:3]
                 elif self.clydePossibleDirection == "Left":
                     if self.clyde.collisionBox.colliderect(self.ghostCollisionLeft):
                         self.clyde.setPos(228, 108)
-                    self.clyde.move(-8, 0)
+                    self.clyde.move(-1, 0)
                     self.clyde.okMovement = self.clyde.allMovement.copy()[1:]
                 elif self.clydePossibleDirection == "Up":
-                    self.clyde.move(0, -8)
+                    self.clyde.move(0, -1)
                     self.clyde.okMovement = (
                         self.clyde.allMovement.copy()[0:1]
                         + self.clyde.allMovement.copy()[2:4]
@@ -1362,8 +1360,8 @@ class Game:
 
             self.blinkyMovement()
             self.pinkyMovement()
-            # self.inkyMovement()
-            # self.clydeMovement()
+            self.inkyMovement()
+            self.clydeMovement()
 
             self.pacmanCheck += 1
 
@@ -1375,14 +1373,16 @@ class Game:
 
             self.blinkyCheck += 1
             self.pinkyCheck += 1
+            self.inkyCheck += 1
+            self.clydeCheck += 1
 
             if self.blinkyLife >= 420:
                 self.blinky.isScatter = False
             if self.pinkyLife >= 420:
                 self.pinky.isScatter = False
-            if self.inkyLife >= 70:
+            if self.inkyLife >= 420:
                 self.inky.isScatter = False
-            if self.clydeLife >= 70:
+            if self.clydeLife >= 420:
                 self.clyde.isScatter = False
 
             if self.timeFright == 0:
@@ -1393,7 +1393,7 @@ class Game:
                 self.clyde.firstFright = True
             else:
                 self.timeFright -= 1
-            self.clock.tick(60)
+            self.clock.tick(30)
 
 
 if __name__ == "__main__":
