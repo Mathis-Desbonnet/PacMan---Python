@@ -35,6 +35,11 @@ class Game:
             .convert_alpha()
             .subsurface((131, 64, 16, 16))
         )
+        self.imageGoToHub = (
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((131, 80, 16, 16))
+        )
         
         self.running = True
 
@@ -51,21 +56,26 @@ class Game:
         self.blinky = Blinky(x=108, y=108)
         self.blinkyLife = 0
         self.blinkyCheck = 0
+        self.blinkyGoToHub = False
+        self.blinkyFright = False
         self.blinkyPossibleDirection = "Up"
 
         self.pinky = Pinky(x=92, y=108)
         self.pinkyLife = 0
         self.pinkyCheck = 0
+        self.pinkyGoToHub = False
         self.pinkyPossibleDirection = "Up"
 
         self.inky = Inky(x=108, y=84)
         self.inkyLife = 0
         self.inkyCheck = 0
+        self.inkyGoToHub = False
         self.inkyPossibleDirection = "Right"
 
         self.clyde = Clyde(x=92, y=84)
         self.clydeLife = 0
         self.clydeCheck = 0
+        self.clydeGoToHub = False
         self.clydePossibleDirection = "Right"
 
         self.group.add(self.blinky)
@@ -148,36 +158,38 @@ class Game:
                 self.scoreBox.y = y + 4
 
     def checkSpriteCollision(self):
+        if (self.blinky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.blinky.rect):
+            self.running = False
+        elif self.pacman.rect.colliderect(self.blinky.rect) and self.blinkyFright:
+            self.blinkyGoToHub = True
         if self.gameState == "Fright":
-            if self.pacman.rect.colliderect(self.blinky.rect):
-                self.blinky.setPos(108, 108)
-                self.blinkyLife = 0
-                self.blinkyCheck = 0
-                self.blinkyPossibleDirection = "Up"
             if self.pacman.rect.colliderect(self.pinky.rect):
+                # self.pinkyGoToHub = True
                 self.pinky.setPos(92, 108)
                 self.pinkyLife = 0
                 self.pinkyCheck = 0
                 self.pinkyPossibleDirection = "Up"
             if self.pacman.rect.colliderect(self.inky.rect):
+                #self.inkyGoToHub = True
                 self.inky.setPos(108, 84)
                 self.inkyLife = 0
                 self.inkyCheck = 0
                 self.inkyPossibleDirection = "Right"
             if self.pacman.rect.colliderect(self.clyde.rect):
+                #self.clydeGoToHub = True
                 self.clyde.setPos(92, 84)
                 self.clydeLife = 0
                 self.clydeCheck = 0
                 self.clydePossibleDirection = "Right"
-        else:
-            if self.scoreBox.colliderect(self.blinky.rect):
-                self.running = False
-            if self.scoreBox.colliderect(self.pinky.rect):
-                self.running = False
-            if self.scoreBox.colliderect(self.inky.rect):
-                self.running = False
-            if self.scoreBox.colliderect(self.clyde.rect):
-                self.running = False
+        # else:
+        #     if self.scoreBox.colliderect(self.blinky.rect):
+        #         self.running = False
+        #     if self.scoreBox.colliderect(self.pinky.rect):
+        #         self.running = False
+        #     if self.scoreBox.colliderect(self.inky.rect):
+        #         self.running = False
+        #     if self.scoreBox.colliderect(self.clyde.rect):
+        #         self.running = False
 
     def input(self):
         #print("pacman x, y =", self.pacman.rect.x, self.pacman.rect.y)
@@ -271,6 +283,8 @@ class Game:
                         self.group.remove(gommeOnScreen)
                         self.group.update()
                         self.gameState = "Fright"
+                        self.blinkyFright = True
+                        self.blinky.isScatter = False
                         self.timeFright = 420
         self.group.draw(self.screen)
 
@@ -292,7 +306,7 @@ class Game:
         if self.blinkyLife <= 23:
             self.blinky.move(0, -1)
         else:
-            if self.gameState == "Fright" and self.blinkyCheck >= 8:
+            if (self.blinkyFright and self.blinkyCheck >= 8) and not self.blinkyGoToHub:
                 self.blinkyCheck = 0
                 # print("MODDDIIIIIIFFFFYY")
                 if self.blinky.firstFright:
@@ -387,16 +401,26 @@ class Game:
                     self.screen, (0, 255, 255), self.blinky.collisionBox, 1
                 )
             elif (
-                self.gameState == "Chase" or self.blinky.isScatter
+                self.gameState == "Chase" or self.blinky.isScatter or self.blinkyGoToHub
             ) and self.blinkyCheck >= 8:
-                # print("MODDDIIIIIIFFFFYY")
+                print("MODDDIIIIIIFFFFYY")
                 min = 1000000000000000000000
                 self.blinkyCheck = 0
                 for i in self.blinky.okMovement:
                     plusPetit = True
                     if i == "Right":
                         self.blinky.moveCollisionBox(8, 0)
-                        if self.blinky.isScatter:
+                        if self.blinkyGoToHub:
+                            self.blinkyDistance = sqrt(
+                                (self.blinky.collisionBox.x - 108)
+                                ** 2
+                                + (
+                                    self.blinky.collisionBox.y
+                                    - 108
+                                )
+                                ** 2
+                            )
+                        elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
                                 (self.blinky.collisionBox.x - self.blinky.basePoint[0])
                                 ** 2
@@ -413,18 +437,33 @@ class Game:
                             )
                         # pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
                         # pygame.display.flip()
-                        for collision in self.collisions:
-                            if self.blinky.collisionBox.colliderect(
-                                self.collisionHub
-                            ) or self.blinky.collisionBox.colliderect(collision):
-                                plusPetit = False
+                        if self.blinkyGoToHub:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
+                        else:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(
+                                    self.collisionHub
+                                ) or self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
                         if self.blinkyDistance <= min and plusPetit:
                             min = self.blinkyDistance
                             self.blinkyPossibleDirection = "Right"
                         self.blinky.moveCollisionBox(-8, 0)
                     elif i == "Down":
                         self.blinky.moveCollisionBox(0, 8)
-                        if self.blinky.isScatter:
+                        if self.blinkyGoToHub:
+                            self.blinkyDistance = sqrt(
+                                (self.blinky.collisionBox.x - 108)
+                                ** 2
+                                + (
+                                    self.blinky.collisionBox.y
+                                    - 108
+                                )
+                                ** 2
+                            )
+                        elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
                                 (self.blinky.collisionBox.x - self.blinky.basePoint[0])
                                 ** 2
@@ -441,18 +480,33 @@ class Game:
                             )
                         # pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
                         # pygame.display.flip()
-                        for collision in self.collisions:
-                            if self.blinky.collisionBox.colliderect(
-                                self.collisionHub
-                            ) or self.blinky.collisionBox.colliderect(collision):
-                                plusPetit = False
+                        if self.blinkyGoToHub:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
+                        else:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(
+                                    self.collisionHub
+                                ) or self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
                         if self.blinkyDistance <= min and plusPetit:
                             min = self.blinkyDistance
                             self.blinkyPossibleDirection = "Down"
                         self.blinky.moveCollisionBox(0, -8)
                     elif i == "Left":
                         self.blinky.moveCollisionBox(-8, 0)
-                        if self.blinky.isScatter:
+                        if self.blinkyGoToHub:
+                            self.blinkyDistance = sqrt(
+                                (self.blinky.collisionBox.x - 108)
+                                ** 2
+                                + (
+                                    self.blinky.collisionBox.y
+                                    - 108
+                                )
+                                ** 2
+                            )
+                        elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
                                 (self.blinky.collisionBox.x - self.blinky.basePoint[0])
                                 ** 2
@@ -469,18 +523,33 @@ class Game:
                             )
                         # pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
                         # pygame.display.flip()
-                        for collision in self.collisions:
-                            if self.blinky.collisionBox.colliderect(
-                                self.collisionHub
-                            ) or self.blinky.collisionBox.colliderect(collision):
-                                plusPetit = False
+                        if self.blinkyGoToHub:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
+                        else:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(
+                                    self.collisionHub
+                                ) or self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
                         if self.blinkyDistance <= min and plusPetit:
                             min = self.blinkyDistance
                             self.blinkyPossibleDirection = "Left"
                         self.blinky.moveCollisionBox(8, 0)
                     elif i == "Up":
                         self.blinky.moveCollisionBox(0, -8)
-                        if self.blinky.isScatter:
+                        if self.blinkyGoToHub:
+                            self.blinkyDistance = sqrt(
+                                (self.blinky.collisionBox.x - 108)
+                                ** 2
+                                + (
+                                    self.blinky.collisionBox.y
+                                    - 108
+                                )
+                                ** 2
+                            )
+                        elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
                                 (self.blinky.collisionBox.x - self.blinky.basePoint[0])
                                 ** 2
@@ -497,11 +566,16 @@ class Game:
                             )
                         # pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
                         # pygame.display.flip()
-                        for collision in self.collisions:
-                            if self.blinky.collisionBox.colliderect(
-                                self.collisionHub
-                            ) or self.blinky.collisionBox.colliderect(collision):
-                                plusPetit = False
+                        if self.blinkyGoToHub:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
+                        else:
+                            for collision in self.collisions:
+                                if self.blinky.collisionBox.colliderect(
+                                    self.collisionHub
+                                ) or self.blinky.collisionBox.colliderect(collision):
+                                    plusPetit = False
                         if self.blinkyDistance <= min and plusPetit:
                             min = self.blinkyDistance
                             self.blinkyPossibleDirection = "Up"
@@ -530,6 +604,15 @@ class Game:
                         self.blinky.allMovement.copy()[0:1]
                         + self.blinky.allMovement.copy()[2:4]
                     )
+                    
+            if self.blinky.rect.x == 108 and self.blinky.rect.y == 108:
+                self.blinkyGoToHub = False
+                self.blinky.setPos(108, 107)
+                self.blinkyLife = 0
+                self.blinkyCheck = 0
+                self.blinkyPossibleDirection = "Up"
+                self.blinkyFright = False
+                self.blinky.isScatter = True
 
     def pinkyMovement(self):
         if self.pinkyLife <= 7:
@@ -562,19 +645,19 @@ class Game:
                                 )
                 self.pinky.firstFright = False
                 listValidMove = self.pinky.okMovement.copy()
-                print(listValidMove)
-                print(self.pinky.okMovement)
-                print()
+                # print(listValidMove)
+                # print(self.pinky.okMovement)
+                # print()
                 for i in self.pinky.okMovement:
                     kill = False
-                    print(i)
+                    # print(i)
                     if i == "Right":
                         self.pinky.moveCollisionBox(1, 0)
                         for collision in self.collisions:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                print("remove = ", i)
+                                # print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
@@ -585,7 +668,7 @@ class Game:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                print("remove = ", i)
+                                # print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
@@ -596,7 +679,7 @@ class Game:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                print("remove = ", i)
+                                # print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
@@ -607,7 +690,7 @@ class Game:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                print("remove = ", i)
+                                # print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
@@ -1340,6 +1423,11 @@ class Game:
 
             # pygame.draw.rect(self.screen, (0, 255, 255), self.clyde.rect, 1)
             self.screen.blit(self.imageFright, self.clyde.getPos())
+        
+        if self.blinky.isScatter:
+            self.blinky.image = self.blinky.imageBackup
+        if self.blinkyGoToHub:
+            self.blinky.image = self.imageGoToHub
 
         # pygame.draw.rect(self.screen, (255, 0, 0), self.pacman.getRect(), 1)
         # pygame.draw.rect(self.screen, (188, 0, 255), pygame.Rect(self.pacman.rect.x+self.pinkyDirectionAddition[0], self.pacman.rect.y+self.pinkyDirectionAddition[1], 16, 16), 1)
@@ -1392,7 +1480,10 @@ class Game:
             self.pinkyCheck += 1
             self.inkyCheck += 1
             self.clydeCheck += 1
-
+            
+            print(self.blinky.rect.x, self.blinky.rect.y)
+            print(self.blinky.collisionBox.x, self.blinky.collisionBox.y)
+            
             if self.blinkyLife >= 420:
                 self.blinky.isScatter = False
             if self.pinkyLife >= 420:
@@ -1404,6 +1495,7 @@ class Game:
 
             if self.timeFright == 0:
                 self.gameState = "Chase"
+                self.blinkyFright = False
                 self.blinky.firstFright = True
                 self.pinky.firstFright = True
                 self.inky.firstFright = True
