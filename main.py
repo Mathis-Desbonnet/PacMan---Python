@@ -10,13 +10,14 @@ from blinky import Blinky
 from pinky import Pinky
 from inky import Inky
 from clyde import Clyde
+from life import Life
 
 pygame.init()
 
 
 class Game:
     def __init__(self) -> None:
-        self.screen = pygame.display.set_mode((448, 496))
+        self.screen = pygame.display.set_mode((448, 550))
         self.clock = pygame.time.Clock()
 
         self.map = pytmx.load_pygame("./data/Map.tmx")
@@ -27,6 +28,10 @@ class Game:
         self.background = self.map.layers[0]
 
         self.group = pyscroll.PyscrollGroup(map_layer=layer)
+        
+        pygame.font.init()
+        
+        self.font = pygame.font.Font("./data/emulogic.ttf", 16)
 
         self.gameState = "Chase"
         self.timeFright = 0
@@ -41,7 +46,10 @@ class Game:
             .subsurface((131, 80, 16, 16))
         )
         
+        self.imageLife = pygame.transform.scale2x((pygame.image.load("./data/PacManSprites.png").convert_alpha().subsurface((19, 15, 16, 16))))
+        
         self.running = True
+        self.numberLife = 3
 
         self.pacman = Pacman()
         self.pacmanSpeed = 1
@@ -161,25 +169,41 @@ class Game:
                 self.scoreBox.y = y + 4
 
     def checkSpriteCollision(self):
-        # if (self.blinky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.blinky.rect):
-        #     self.running = False
-        if self.pacman.rect.colliderect(self.blinky.rect) and self.blinkyFright:
+        if (self.blinky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.blinky.rect):
+            self.numberLife -= 1
+            self.pacman.setPos(108, 132)
+            self.CollisionBox.x, self.CollisionBox.y = self.pacman.rect.x, self.pacman.rect.y
+            self.scoreBox.x, self.scoreBox.y = self.pacman.rect.x + 4, self.pacman.rect.y + 4
+        if self.pacman.rect.colliderect(self.blinky.rect) and self.blinkyFright and not self.blinkyGoToHub:
             self.blinkyGoToHub = True
+            self.score += 700
             
-        # if (self.pinky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.pinky.rect):
-        #     self.running = False
-        if self.pacman.rect.colliderect(self.pinky.rect) and self.pinkyFright:
+        if (self.pinky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.pinky.rect):
+            self.numberLife -= 1
+            self.pacman.setPos(108, 132)
+            self.CollisionBox.x, self.CollisionBox.y = self.pacman.rect.x, self.pacman.rect.y
+            self.scoreBox.x, self.scoreBox.y = self.pacman.rect.x + 4, self.pacman.rect.y + 4
+        if (self.pacman.rect.colliderect(self.pinky.rect) and self.pinkyFright) and not self.pinkyGoToHub:
             self.pinkyGoToHub = True
+            self.score += 700
             
-        # if (self.inky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.inky.rect):
-        #     self.running = False
-        if self.pacman.rect.colliderect(self.inky.rect) and self.inkyFright:
+        if (self.inky.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.inky.rect):
+            self.numberLife -= 1
+            self.pacman.setPos(108, 132)
+            self.CollisionBox.x, self.CollisionBox.y = self.pacman.rect.x, self.pacman.rect.y
+            self.scoreBox.x, self.scoreBox.y = self.pacman.rect.x + 4, self.pacman.rect.y + 4
+        if self.pacman.rect.colliderect(self.inky.rect) and self.inkyFright and not self.inkyGoToHub:
             self.inkyGoToHub = True
+            self.score += 700
             
-        # if (self.clyde.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.clyde.rect):
-        #     self.running = False
-        if self.pacman.rect.colliderect(self.clyde.rect) and self.clydeFright:
+        if (self.clyde.isScatter or self.gameState == "Chase") and self.scoreBox.colliderect(self.clyde.rect):
+            self.numberLife -= 1
+            self.pacman.setPos(108, 132)
+            self.CollisionBox.x, self.CollisionBox.y = self.pacman.rect.x, self.pacman.rect.y
+            self.scoreBox.x, self.scoreBox.y = self.pacman.rect.x + 4, self.pacman.rect.y + 4
+        if self.pacman.rect.colliderect(self.clyde.rect) and self.clydeFright and not self.clydeGoToHub:
             self.clydeGoToHub = True
+            self.score += 700
             
         if self.gameState == "Fright":
             pass
@@ -294,6 +318,7 @@ class Game:
                         self.clydeFright = True
                         self.clyde.isScatter = False
                         self.timeFright = 420
+                        self.score += 50
         self.group.draw(self.screen)
 
     def addScore(self):
@@ -613,7 +638,7 @@ class Game:
                         + self.blinky.allMovement.copy()[2:4]
                     )
                     
-            if self.blinky.rect.x == 108 and self.blinky.rect.y == 108:
+            if self.blinky.rect.x == 108 and self.blinky.rect.y == 108 and self.blinkyGoToHub:
                 self.blinkyGoToHub = False
                 self.blinky.setPos(108, 107)
                 self.blinkyLife = 0
@@ -939,7 +964,7 @@ class Game:
                         + self.pinky.allMovement.copy()[2:4]
                     )
                     
-            if self.pinky.rect.x == 92 and self.pinky.rect.y == 108:
+            if self.pinky.rect.x == 92 and self.pinky.rect.y == 108 and self.pinkyGoToHub:
                 self.pinkyGoToHub = False
                 self.pinky.setPos(93, 108)
                 self.pinkyLife = 0
@@ -1217,7 +1242,7 @@ class Game:
                         + self.inky.allMovement.copy()[2:4]
                     )
             
-            if self.inky.rect.x == 108 and self.inky.rect.y == 84:
+            if self.inky.rect.x == 108 and self.inky.rect.y == 84 and self.inkyGoToHub:
                 self.inkyGoToHub = False
                 self.inky.setPos(108, 83)
                 self.inkyLife = 0
@@ -1548,7 +1573,7 @@ class Game:
                         + self.clyde.allMovement.copy()[2:4]
                     )
                     
-            if self.clyde.rect.x == 92 and self.clyde.rect.y == 84:
+            if self.clyde.rect.x == 92 and self.clyde.rect.y == 84 and self.clydeGoToHub:
                 self.clydeGoToHub = False
                 self.clyde.setPos(92, 83)
                 self.clydeLife = 0
@@ -1567,10 +1592,8 @@ class Game:
         #             )
 
         # pygame.draw.rect(self.screen, (255, 0, 0), self.CollisionBox, 1)
-        pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
         #print(self.blinky.rect.x, self.blinky.rect.y)
         #print(self.blinky.collisionBox.x, self.blinky.collisionBox.y)
-        pygame.display.flip()
         if self.pacmanLife % 5 == 0:
             self.pacman.image = self.pacman.animation(self.pacmanWay)[
                 self.pacmanLife % 3
@@ -1648,12 +1671,23 @@ class Game:
 
         # pygame.draw.circle(self.screen, (255, 200, 0), self.pacman.rect.center, 64, 1)
 
-        for gomme in self.gommes:
-            self.screen.blit(gomme.image, (gomme.rect.x, gomme.rect.y))
-
         self.group.update()
         self.group.draw(self.screen)
-
+        
+        textScore = self.font.render(str(self.score), True, (255, 255, 255))
+        self.screen.blit(textScore, (200, 511))
+        if self.numberLife == 3:
+            self.screen.blit(self.imageLife, (32, 511))
+            self.screen.blit(self.imageLife, (70, 511))
+            self.screen.blit(self.imageLife, (108, 511))
+        elif self.numberLife == 2:
+            self.screen.blit(self.imageLife, (70, 511))
+            self.screen.blit(self.imageLife, (108, 511))
+            
+        elif self.numberLife == 1:
+            self.screen.blit(self.imageLife, (108, 511))
+        
+        pygame.display.flip()
         pygame.display.update()
 
     def run(self) -> None:
@@ -1687,6 +1721,8 @@ class Game:
             self.inkyCheck += 1
             self.clydeCheck += 1
             
+            if self.numberLife <= 0:
+                self.running = False
             
             if self.blinkyLife >= 420:
                 self.blinky.isScatter = False
