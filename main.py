@@ -53,6 +53,7 @@ class Game:
 
         self.pinky = Pinky(x=92, y=108)
         self.pinkyLife = 0
+        self.pinkyCheck = 0
         self.pinkyPossibleDirection = "Up"
 
         self.inky = Inky(x=108, y=84)
@@ -160,8 +161,8 @@ class Game:
                 self.clydeLife = 0
 
     def input(self):
-        print("pacman x, y =", self.pacman.rect.x, self.pacman.rect.y)
-        print("collision pacman x, y =", self.CollisionBox.x, self.CollisionBox.y)
+        #print("pacman x, y =", self.pacman.rect.x, self.pacman.rect.y)
+        #print("collision pacman x, y =", self.CollisionBox.x, self.CollisionBox.y)
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_z]:
@@ -238,7 +239,7 @@ class Game:
             self.CollisionBox.x = self.pacman.rect.x
             self.CollisionBox.y = self.pacman.rect.y
 
-        print(self.pacmanLastWay)
+        #print(self.pacmanLastWay)
 
     def setState(self):
         for gomme in self.gommePlusSpawn:
@@ -512,93 +513,91 @@ class Game:
                     )
 
     def pinkyMovement(self):
-        if self.pinkyLife == 0:
-            self.pinky.move(8, 0)
-        elif self.pinkyLife <= 3:
-            self.pinky.move(0, -8)
+        if self.pinkyLife <= 7:
+            self.pinky.move(1, 0)
+        elif self.pinkyLife <= 31:
+            self.pinky.move(0, -1)
         else:
-            if self.gameState == "Fright":
+            if self.gameState == "Fright" and self.pinkyCheck >= 8:
+                self.pinkyCheck = 0
                 if self.pinky.firstFright:
                     for i in self.pinky.allMovement:
                         if i not in self.pinky.okMovement:
                             if i == "Right":
-                                self.pinky.move(8, 0)
                                 self.pinky.okMovement = (
                                     self.pinky.allMovement.copy()[:2]
                                     + self.pinky.allMovement.copy()[3:4]
                                 )
                             elif i == "Down":
-                                self.pinky.move(0, 8)
                                 self.pinky.okMovement = self.pinky.allMovement.copy()[
                                     :3
                                 ]
                             elif i == "Left":
-                                self.pinky.move(-8, 0)
                                 self.pinky.okMovement = self.pinky.allMovement.copy()[
                                     1:4
                                 ]
                             elif i == "Up":
-                                self.pinky.move(0, -8)
                                 self.pinky.okMovement = (
                                     self.pinky.allMovement.copy()[:1]
                                     + self.pinky.allMovement.copy()[2:4]
                                 )
                 self.pinky.firstFright = False
                 listValidMove = self.pinky.okMovement.copy()
-                # print(listValidMove)
-                # print(self.pinky.okMovement)
-                # print()
+                print(listValidMove)
+                print(self.pinky.okMovement)
+                print()
                 for i in self.pinky.okMovement:
                     kill = False
-                    # print(i)
+                    print(i)
                     if i == "Right":
-                        self.pinky.moveCollisionBox(8, 0)
+                        self.pinky.moveCollisionBox(1, 0)
                         for collision in self.collisions:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                # print("remove = ", i)
+                                print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.pinky.moveCollisionBox(-8, 0)
+                        self.pinky.moveCollisionBox(-1, 0)
                     elif i == "Down":
-                        self.pinky.moveCollisionBox(0, 8)
+                        self.pinky.moveCollisionBox(0, 1)
                         for collision in self.collisions:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                # print("remove = ", i)
+                                print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.pinky.moveCollisionBox(0, -8)
+                        self.pinky.moveCollisionBox(0, -1)
                     elif i == "Left":
-                        self.pinky.moveCollisionBox(-8, 0)
+                        self.pinky.moveCollisionBox(-1, 0)
                         for collision in self.collisions:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                # print("remove = ", i)
+                                print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.pinky.moveCollisionBox(8, 0)
+                        self.pinky.moveCollisionBox(1, 0)
                     elif i == "Up":
-                        self.pinky.moveCollisionBox(0, -8)
+                        self.pinky.moveCollisionBox(0, -1)
                         for collision in self.collisions:
                             if self.pinky.collisionBox.colliderect(
                                 collision
                             ) or self.pinky.collisionBox.colliderect(self.collisionHub):
-                                # print("remove = ", i)
+                                print("remove = ", i)
                                 kill = True
                         if kill:
                             listValidMove.remove(i)
-                        self.pinky.moveCollisionBox(0, 8)
+                        self.pinky.moveCollisionBox(0, 1)
                 self.pinkyPossibleDirection = random.choice(listValidMove)
 
-            elif self.gameState == "Chase" or self.pinky.isScatter:
+            elif (self.gameState == "Chase" or self.pinky.isScatter) and self.pinkyCheck >= 8:
                 min = 1000000000000000000000
+                self.pinkyCheck = 0
                 for i in self.pinky.okMovement:
                     plusPetit = True
                     if i == "Right":
@@ -758,25 +757,25 @@ class Game:
                             self.pinkyPossibleDirection = "Up"
                         self.pinky.moveCollisionBox(0, 8)
 
-            if self.pinkyLife >= 4:
+            if self.pinkyLife >= 32:
                 if self.pinkyPossibleDirection == "Right":
                     if self.pinky.collisionBox.colliderect(self.ghostCollisionRight):
-                        self.pinky.setPos(-20, 108)
-                    self.pinky.move(8, 0)
+                        self.pinky.setPos(-3, 108)
+                    self.pinky.move(1, 0)
                     self.pinky.okMovement = (
                         self.pinky.allMovement.copy()[0:2]
                         + self.pinky.allMovement.copy()[3:4]
                     )
                 elif self.pinkyPossibleDirection == "Down":
-                    self.pinky.move(0, 8)
+                    self.pinky.move(0, 1)
                     self.pinky.okMovement = self.pinky.allMovement.copy()[:3]
                 elif self.pinkyPossibleDirection == "Left":
                     if self.pinky.collisionBox.colliderect(self.ghostCollisionLeft):
-                        self.pinky.setPos(228, 108)
-                    self.pinky.move(-8, 0)
+                        self.pinky.setPos(211, 108)
+                    self.pinky.move(-1, 0)
                     self.pinky.okMovement = self.pinky.allMovement.copy()[1:]
                 elif self.pinkyPossibleDirection == "Up":
-                    self.pinky.move(0, -8)
+                    self.pinky.move(0, -1)
                     self.pinky.okMovement = (
                         self.pinky.allMovement.copy()[0:1]
                         + self.pinky.allMovement.copy()[2:4]
@@ -1280,8 +1279,8 @@ class Game:
 
         # pygame.draw.rect(self.screen, (255, 0, 0), self.CollisionBox, 1)
         pygame.draw.rect(self.screen, (255, 0, 0), self.blinky.collisionBox, 1)
-        print(self.blinky.rect.x, self.blinky.rect.y)
-        print(self.blinky.collisionBox.x, self.blinky.collisionBox.y)
+        #print(self.blinky.rect.x, self.blinky.rect.y)
+        #print(self.blinky.collisionBox.x, self.blinky.collisionBox.y)
         pygame.display.flip()
         if self.pacmanLife % 5 == 0:
             self.pacman.image = self.pacman.animation(self.pacmanWay)[
@@ -1362,8 +1361,7 @@ class Game:
             self.checkSpriteCollision()
 
             self.blinkyMovement()
-            print(self.pacmanSpeed)
-            # self.pinkyMovement()
+            self.pinkyMovement()
             # self.inkyMovement()
             # self.clydeMovement()
 
@@ -1376,10 +1374,11 @@ class Game:
             self.clydeLife += 1
 
             self.blinkyCheck += 1
+            self.pinkyCheck += 1
 
             if self.blinkyLife >= 420:
                 self.blinky.isScatter = False
-            if self.pinkyLife >= 70:
+            if self.pinkyLife >= 420:
                 self.pinky.isScatter = False
             if self.inkyLife >= 70:
                 self.inky.isScatter = False
