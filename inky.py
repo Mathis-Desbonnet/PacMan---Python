@@ -21,6 +21,27 @@ class Inky(pygame.sprite.Sprite):
         self.allMovement = ["Right", "Down", "Left", "Up"]
         self.okMovement = ["Right", "Left", "Up"]
 
+        self.bug = False
+        self.bugCounter = 0
+
+        self.frameFright = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((131, 64, 16, 16)),
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((147, 64, 16, 16)),
+        ]
+
+        self.frameFrightBug = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((163, 64, 16, 16)),
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((179, 64, 16, 16)),
+        ]
+
     def setPos(self, x, y):
         self.rect.x = x
         self.rect.y = y

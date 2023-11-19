@@ -1701,11 +1701,35 @@ class Game:
                     self.blinky.image = self.blinky.frameFrightBug[self.blinkyLife % 2]
                 else:
                     self.blinky.image = self.blinky.frameFright[self.blinkyLife % 2]
+
+                if self.pinky.bugCounter >= 30:
+                    self.pinky.bug = not self.pinky.bug
+                    self.pinky.bugCounter = 0
+                if self.pinky.bug:
+                    self.pinky.image = self.pinky.frameFrightBug[self.pinkyLife % 2]
+                else:
+                    self.pinky.image = self.pinky.frameFright[self.pinkyLife % 2]
+
+                if self.inky.bugCounter >= 30:
+                    self.inky.bug = not self.inky.bug
+                    self.inky.bugCounter = 0
+                if self.inky.bug:
+                    self.inky.image = self.inky.frameFrightBug[self.inkyLife % 2]
+                else:
+                    self.inky.image = self.inky.frameFright[self.inkyLife % 2]
+
+                if self.clyde.bugCounter >= 30:
+                    self.clyde.bug = not self.clyde.bug
+                    self.clyde.bugCounter = 0
+                if self.clyde.bug:
+                    self.clyde.image = self.clyde.frameFrightBug[self.clydeLife % 2]
+                else:
+                    self.clyde.image = self.clyde.frameFright[self.clydeLife % 2]
             else:
                 self.blinky.image = self.blinky.frameFright[self.blinkyLife % 2]
-            self.pinky.image = self.imageFright
-            self.inky.image = self.imageFright
-            self.clyde.image = self.imageFright
+                self.pinky.image = self.imageFright
+                self.inky.image = self.imageFright
+                self.clyde.image = self.imageFright
 
             # pygame.draw.rect(self.screen, (0, 255, 255), self.blinky.rect, 1)
             self.screen.blit(self.imageFright, self.blinky.getPos())
@@ -1772,6 +1796,7 @@ class Game:
         pygame.mixer.Sound.play(self.sirenGhost1, -1)
         self.sirenPlaying = True
         while self.running:
+            print(self.numberLife)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -1801,6 +1826,9 @@ class Game:
             self.clydeCheck += 1
 
             self.blinky.bugCounter += 1
+            self.pinky.bugCounter += 1
+            self.inky.bugCounter += 1
+            self.clyde.bugCounter += 1
 
             if (
                 not self.ghostFrightSoundPlaying
@@ -1880,6 +1908,7 @@ class Game:
         pygame.mixer.Sound.stop(self.sirenGhost1)
         pygame.mixer.Sound.play(self.deathSound)
         while self.runDeath:
+            print(self.numberLife)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.runDeath = False
@@ -1908,7 +1937,7 @@ class Game:
             if self.deathTime % 10 == 0:
                 self.deathAnim += 1
 
-            if self.deathTime == 120 and self.numberLife != 0:
+            if self.deathTime == 120 and self.numberLife > 0:
                 self.deathAnim = 0
                 self.deathTime = 0
                 self.runDeath = False
