@@ -30,6 +30,18 @@ class Game:
         self.group = pyscroll.PyscrollGroup(map_layer=layer)
 
         self.deathSound = pygame.mixer.Sound("./data/pacman_death.wav")
+        self.eatGhostSound = pygame.mixer.Sound("./data/eat_ghost.wav")
+        self.ghostGoToHubSound = pygame.mixer.Sound("./data/retreating.wav")
+        self.munchSound = [
+            pygame.mixer.Sound("./data/munch_1.wav"),
+            pygame.mixer.Sound("./data/munch_2.wav"),
+        ]
+        self.powerPelletSound = pygame.mixer.Sound("./data/power_pellet.wav")
+        self.sirenGhost1 = pygame.mixer.Sound("./data/siren_1.wav")
+
+        self.ghostGoToHubSoundPlaying = False
+        self.ghostFrightSoundPlaying = False
+        self.sirenPlaying = False
 
         pygame.font.init()
         self.font = pygame.font.Font("./data/emulogic.ttf", 32)
@@ -110,8 +122,10 @@ class Game:
         self.scoreBox = pygame.Rect(
             self.pacman.rect.x + 4, self.pacman.rect.y + 4, 8, 8
         )
+
         self.running = True
         self.score = 0
+        self.numberGom = 0
 
         self.collisions = []
         self.collisionHub = None
@@ -208,15 +222,9 @@ class Game:
             self.pinky.isScatter or self.gameState == "Chase"
         ) and self.scoreBox.colliderect(self.pinky.rect):
             self.numberLife -= 1
-            self.pacman.setPos(108, 132)
-            self.CollisionBox.x, self.CollisionBox.y = (
-                self.pacman.rect.x,
-                self.pacman.rect.y,
-            )
-            self.scoreBox.x, self.scoreBox.y = (
-                self.pacman.rect.x + 4,
-                self.pacman.rect.y + 4,
-            )
+            self.runDeath = True
+            self.running = False
+            self.runAfterDeath()
         if (
             self.pacman.rect.colliderect(self.pinky.rect) and self.pinkyFright
         ) and not self.pinkyGoToHub:
@@ -227,15 +235,9 @@ class Game:
             self.inky.isScatter or self.gameState == "Chase"
         ) and self.scoreBox.colliderect(self.inky.rect):
             self.numberLife -= 1
-            self.pacman.setPos(108, 132)
-            self.CollisionBox.x, self.CollisionBox.y = (
-                self.pacman.rect.x,
-                self.pacman.rect.y,
-            )
-            self.scoreBox.x, self.scoreBox.y = (
-                self.pacman.rect.x + 4,
-                self.pacman.rect.y + 4,
-            )
+            self.runDeath = True
+            self.running = False
+            self.runAfterDeath()
         if (
             self.pacman.rect.colliderect(self.inky.rect)
             and self.inkyFright
@@ -248,15 +250,9 @@ class Game:
             self.clyde.isScatter or self.gameState == "Chase"
         ) and self.scoreBox.colliderect(self.clyde.rect):
             self.numberLife -= 1
-            self.pacman.setPos(108, 132)
-            self.CollisionBox.x, self.CollisionBox.y = (
-                self.pacman.rect.x,
-                self.pacman.rect.y,
-            )
-            self.scoreBox.x, self.scoreBox.y = (
-                self.pacman.rect.x + 4,
-                self.pacman.rect.y + 4,
-            )
+            self.runDeath = True
+            self.running = False
+            self.runAfterDeath()
         if (
             self.pacman.rect.colliderect(self.clyde.rect)
             and self.clydeFright
@@ -379,6 +375,11 @@ class Game:
                         self.clyde.isScatter = False
                         self.timeFright = 420
                         self.score += 50
+                        self.ghostFrightSoundPlaying = True
+                        self.ghostGoToHubSoundPlaying = False
+                        pygame.mixer.Sound.stop(self.sirenGhost1)
+                        pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+                        pygame.mixer.Sound.play(self.powerPelletSound, -1)
         self.group.draw(self.screen)
 
     def addScore(self):
@@ -391,6 +392,9 @@ class Game:
                     ):
                         self.group.remove(gommeOnScreen)
                         self.group.update()
+                        pygame.mixer.Sound.play(self.munchSound[self.numberGom % 2])
+                        pygame.mixer.Sound.play(self.munchSound[self.numberGom % 2])
+                        self.numberGom += 1
                         self.score += gommeOnScreen.score
         self.group.update()
         self.group.draw(self.screen)
@@ -1765,6 +1769,8 @@ class Game:
         pygame.display.update()
 
     def run(self) -> None:
+        pygame.mixer.Sound.play(self.sirenGhost1, -1)
+        self.sirenPlaying = True
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -1772,7 +1778,6 @@ class Game:
 
             self.input()
             self.addScore()
-            self.updateScreen()
             self.setState()
 
             self.checkSpriteCollision()
@@ -1796,6 +1801,47 @@ class Game:
             self.clydeCheck += 1
 
             self.blinky.bugCounter += 1
+
+            if (
+                not self.ghostFrightSoundPlaying
+                and self.gameState == "Fright"
+                and not self.ghostGoToHubSoundPlaying
+            ):
+                self.ghostFrightSoundPlaying = True
+                self.ghostGoToHubSoundPlaying = False
+                self.sirenPlaying = False
+                pygame.mixer.Sound.stop(self.sirenGhost1)
+                pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+                pygame.mixer.Sound.play(self.powerPelletSound, -1)
+
+            if (
+                self.blinkyGoToHub
+                or self.pinkyGoToHub
+                or self.inkyGoToHub
+                or self.clydeGoToHub
+            ) and not self.ghostGoToHubSoundPlaying:
+                self.ghostFrightSoundPlaying = False
+                self.ghostGoToHubSoundPlaying = True
+                self.sirenPlaying = False
+                pygame.mixer.Sound.stop(self.sirenGhost1)
+                pygame.mixer.Sound.stop(self.powerPelletSound)
+                pygame.mixer.Sound.play(self.ghostGoToHubSound, -1)
+
+            if not (
+                self.blinkyGoToHub
+                or self.pinkyGoToHub
+                or self.inkyGoToHub
+                or self.clydeGoToHub
+            ):
+                self.ghostGoToHubSoundPlaying = False
+
+            if self.timeFright == 0 and not self.sirenPlaying:
+                self.ghostFrightSoundPlaying = False
+                self.ghostGoToHubSoundPlaying = False
+                self.sirenPlaying = True
+                pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+                pygame.mixer.Sound.stop(self.powerPelletSound)
+                pygame.mixer.Sound.play(self.sirenGhost1, -1)
 
             if self.numberLife <= 0:
                 self.running = False
@@ -1821,9 +1867,17 @@ class Game:
                 self.clyde.firstFright = True
             else:
                 self.timeFright -= 1
+
+            self.updateScreen()
             self.clock.tick(60)
 
     def runAfterDeath(self):
+        pygame.mixer.Sound.stop(self.sirenGhost1)
+        pygame.mixer.Sound.stop(self.powerPelletSound)
+        pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+        self.ghostFrightSoundPlaying = False
+        self.ghostGoToHubSoundPlaying = False
+        pygame.mixer.Sound.stop(self.sirenGhost1)
         pygame.mixer.Sound.play(self.deathSound)
         while self.runDeath:
             for event in pygame.event.get():
@@ -1884,6 +1938,11 @@ class Game:
                 self.blinkyGoToHub = False
                 self.blinkyFright = False
                 self.blinkyPossibleDirection = "Up"
+                self.blinky.isScatter = True
+                self.blinky.firstFright = True
+                self.blinky.bug = False
+                self.blinky.bugCounter = 0
+                self.blinky.okMovement = ["Right", "Left", "Up"]
 
                 self.pinky.setPos(92, 108)
                 self.pinkyLife = 0
@@ -1891,6 +1950,11 @@ class Game:
                 self.pinkyGoToHub = False
                 self.pinkyFright = False
                 self.pinkyPossibleDirection = "Up"
+                self.pinky.isScatter = True
+                self.pinky.firstFright = True
+                self.pinky.bug = False
+                self.pinky.bugCounter = 0
+                self.pinky.okMovement = ["Right", "Left", "Up"]
 
                 self.inky.setPos(108, 84)
                 self.inkyLife = 0
@@ -1898,6 +1962,11 @@ class Game:
                 self.inkyGoToHub = False
                 self.inkyFright = False
                 self.inkyPossibleDirection = "Right"
+                self.inky.isScatter = True
+                self.inky.firstFright = True
+                self.inky.bug = False
+                self.inky.bugCounter = 0
+                self.inky.okMovement = ["Right", "Left", "Up"]
 
                 self.clyde.setPos(92, 84)
                 self.clydeLife = 0
@@ -1905,6 +1974,11 @@ class Game:
                 self.clydeGoToHub = False
                 self.clydeFright = False
                 self.clydePossibleDirection = "Right"
+                self.clyde.isScatter = True
+                self.clyde.firstFright = True
+                self.clyde.bug = False
+                self.clyde.bugCounter = 0
+                self.clyde.okMovement = ["Right", "Left", "Up"]
 
                 self.group.add(self.blinky)
                 self.group.add(self.pinky)
@@ -1915,7 +1989,7 @@ class Game:
                 self.group.draw(self.screen)
                 pygame.display.flip()
                 self.run()
-            elif self.deathTime == 120 and self.numberLife == 0:
+            elif self.deathTime == 120 and self.numberLife <= 0:
                 self.runDeath = False
 
             self.deathTime += 1
