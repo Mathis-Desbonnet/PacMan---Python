@@ -17,13 +17,13 @@ pygame.init()
 
 class Game:
     def __init__(self) -> None:
-        self.screen = pygame.display.set_mode((448, 550))
+        self.screen = pygame.display.set_mode((672, 825))
         self.clock = pygame.time.Clock()
 
         self.map = pytmx.load_pygame("./data/Map.tmx")
         test = pyscroll.data.TiledMapData(self.map)
         layer = pyscroll.orthographic.BufferedRenderer(test, self.screen.get_size())
-        layer.zoom = 2
+        layer.zoom = 3
         self.tmx_data = pytmx.util_pygame.load_pygame("./data/Map.tmx")
         self.background = self.map.layers[0]
 
@@ -222,7 +222,7 @@ class Game:
         #print("collision pacman x, y =", self.CollisionBox.x, self.CollisionBox.y)
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_z]:
+        if keys[pygame.K_z] or keys[pygame.K_UP]:
             self.CollisionBox.y -= self.pacmanSpeed
             self.pinkyDirectionAddition = (-32, -32)
             self.inkyDirectionAddition = (-16, -16)
@@ -232,7 +232,7 @@ class Game:
             self.CollisionBox.y = self.pacman.rect.y
             self.pacmanCheck = 0
 
-        if keys[pygame.K_q]:
+        if keys[pygame.K_q] or keys[pygame.K_LEFT]:
             self.CollisionBox.x -= self.pacmanSpeed
             self.pinkyDirectionAddition = (-32, 0)
             self.inkyDirectionAddition = (-16, 0)
@@ -242,7 +242,7 @@ class Game:
             self.CollisionBox.x = self.pacman.rect.x
             self.pacmanCheck = 0
 
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.CollisionBox.y += self.pacmanSpeed
             self.pinkyDirectionAddition = (0, 32)
             self.inkyDirectionAddition = (0, 16)
@@ -252,7 +252,7 @@ class Game:
             self.CollisionBox.y = self.pacman.rect.y
             self.pacmanCheck = 0
 
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.CollisionBox.x += self.pacmanSpeed
             self.pinkyDirectionAddition = (32, 0)
             self.inkyDirectionAddition = (16, 0)
@@ -1604,7 +1604,9 @@ class Game:
             )
 
         if self.gameState == "Chase":
-            self.blinky.image = self.blinky.imageBackup
+            self.blinky.image = self.blinky.animationNotFright(self.blinkyPossibleDirection)[
+                self.blinkyLife % 2
+            ]
             self.pinky.image = self.pinky.imageBackup
             self.inky.image = self.inky.imageBackup
             self.clyde.image = self.clyde.imageBackup
@@ -1621,7 +1623,16 @@ class Game:
             # pygame.draw.rect(self.screen, (255, 200, 255), self.clyde.rect, 1)
             self.screen.blit(self.clyde.image, self.clyde.getPos())
         elif self.gameState == "Fright":
-            self.blinky.image = self.imageFright
+            if self.timeFright <= 180:
+                if self.blinky.bugCounter >= 30:
+                    self.blinky.bug = not self.blinky.bug
+                    self.blinky.bugCounter = 0
+                if self.blinky.bug:
+                    self.blinky.image = self.blinky.frameFrightBug[self.blinkyLife % 2]
+                else:
+                    self.blinky.image = self.blinky.frameFright[self.blinkyLife % 2]
+            else:
+                self.blinky.image = self.blinky.frameFright[self.blinkyLife % 2]
             self.pinky.image = self.imageFright
             self.inky.image = self.imageFright
             self.clyde.image = self.imageFright
@@ -1639,7 +1650,9 @@ class Game:
             self.screen.blit(self.imageFright, self.clyde.getPos())
         
         if self.blinky.isScatter:
-            self.blinky.image = self.blinky.imageBackup
+            self.blinky.image = self.blinky.animationNotFright(self.blinkyPossibleDirection)[
+                self.blinkyLife % 2
+            ]
         if self.blinkyGoToHub:
             self.blinky.image = self.imageGoToHub
             
@@ -1720,6 +1733,8 @@ class Game:
             self.pinkyCheck += 1
             self.inkyCheck += 1
             self.clydeCheck += 1
+            
+            self.blinky.bugCounter += 1
             
             if self.numberLife <= 0:
                 self.running = False
