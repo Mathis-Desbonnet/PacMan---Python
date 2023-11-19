@@ -29,8 +29,9 @@ class Game:
 
         self.group = pyscroll.PyscrollGroup(map_layer=layer)
 
-        pygame.font.init()
+        self.deathSound = pygame.mixer.Sound("./data/pacman_death.wav")
 
+        pygame.font.init()
         self.font = pygame.font.Font("./data/emulogic.ttf", 32)
 
         self.gameState = "Chase"
@@ -56,6 +57,9 @@ class Game:
         )
 
         self.running = True
+        self.runDeath = False
+        self.deathTime = 0
+        self.deathAnim = 0
         self.numberLife = 3
 
         self.pacman = Pacman()
@@ -180,15 +184,18 @@ class Game:
             self.blinky.isScatter or self.gameState == "Chase"
         ) and self.scoreBox.colliderect(self.blinky.rect):
             self.numberLife -= 1
-            self.pacman.setPos(108, 132)
-            self.CollisionBox.x, self.CollisionBox.y = (
-                self.pacman.rect.x,
-                self.pacman.rect.y,
-            )
-            self.scoreBox.x, self.scoreBox.y = (
-                self.pacman.rect.x + 4,
-                self.pacman.rect.y + 4,
-            )
+            self.runDeath = True
+            self.running = False
+            self.runAfterDeath()
+            # self.pacman.setPos(108, 132)
+            # self.CollisionBox.x, self.CollisionBox.y = (
+            #     self.pacman.rect.x,
+            #     self.pacman.rect.y,
+            # )
+            # self.scoreBox.x, self.scoreBox.y = (
+            #     self.pacman.rect.x + 4,
+            #     self.pacman.rect.y + 4,
+            # )
         if (
             self.pacman.rect.colliderect(self.blinky.rect)
             and self.blinkyFright
@@ -1751,13 +1758,8 @@ class Game:
         if self.numberLife == 3:
             self.screen.blit(self.imageLife, (64, 750))
             self.screen.blit(self.imageLife, (148, 750))
-            self.screen.blit(self.imageLife, (232, 750))
         elif self.numberLife == 2:
             self.screen.blit(self.imageLife, (148, 750))
-            self.screen.blit(self.imageLife, (232, 750))
-
-        elif self.numberLife == 1:
-            self.screen.blit(self.imageLife, (232, 750))
 
         pygame.display.flip()
         pygame.display.update()
@@ -1819,6 +1821,105 @@ class Game:
                 self.clyde.firstFright = True
             else:
                 self.timeFright -= 1
+            self.clock.tick(60)
+
+    def runAfterDeath(self):
+        pygame.mixer.Sound.play(self.deathSound)
+        while self.runDeath:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.runDeath = False
+
+            self.group.remove(self.blinky)
+            self.group.remove(self.pinky)
+            self.group.remove(self.inky)
+            self.group.remove(self.clyde)
+            self.group.update()
+            self.group.draw(self.screen)
+
+            textScore = self.font.render(str(self.score), True, (255, 255, 255))
+            self.screen.blit(textScore, (500, 750))
+            if self.numberLife == 3:
+                self.screen.blit(self.imageLife, (64, 750))
+                self.screen.blit(self.imageLife, (148, 750))
+            elif self.numberLife == 2:
+                self.screen.blit(self.imageLife, (148, 750))
+
+            pygame.display.flip()
+            pygame.display.update()
+
+            if self.deathAnim <= 11:
+                self.pacman.image = self.pacman.frameDeath[self.deathAnim]
+
+            if self.deathTime % 10 == 0:
+                self.deathAnim += 1
+
+            if self.deathTime == 120 and self.numberLife != 0:
+                self.deathAnim = 0
+                self.deathTime = 0
+                self.runDeath = False
+                self.running = True
+                self.deathTime = 0
+                self.pacman.setPos(108, 132)
+                self.CollisionBox.x, self.CollisionBox.y = (
+                    self.pacman.rect.x,
+                    self.pacman.rect.y,
+                )
+                self.scoreBox.x, self.scoreBox.y = (
+                    self.pacman.rect.x + 4,
+                    self.pacman.rect.y + 4,
+                )
+                self.pacmanSpeed = 1
+                self.pacmanLife = 0
+                self.pacmanWay = "Right"
+                self.pacmanLastWay = "Right"
+                self.pacmanCheck = 0
+
+                self.pinkyDirectionAddition = (32, 0)
+                self.inkyDirectionAddition = (16, 0)
+
+                self.blinky.setPos(108, 108)
+                self.blinkyLife = 0
+                self.blinkyCheck = 0
+                self.blinkyGoToHub = False
+                self.blinkyFright = False
+                self.blinkyPossibleDirection = "Up"
+
+                self.pinky.setPos(92, 108)
+                self.pinkyLife = 0
+                self.pinkyCheck = 0
+                self.pinkyGoToHub = False
+                self.pinkyFright = False
+                self.pinkyPossibleDirection = "Up"
+
+                self.inky.setPos(108, 84)
+                self.inkyLife = 0
+                self.inkyCheck = 0
+                self.inkyGoToHub = False
+                self.inkyFright = False
+                self.inkyPossibleDirection = "Right"
+
+                self.clyde.setPos(92, 84)
+                self.clydeLife = 0
+                self.clydeCheck = 0
+                self.clydeGoToHub = False
+                self.clydeFright = False
+                self.clydePossibleDirection = "Right"
+
+                self.group.add(self.blinky)
+                self.group.add(self.pinky)
+                self.group.add(self.inky)
+                self.group.add(self.clyde)
+                self.group.add(self.pacman)
+                self.group.update()
+                self.group.draw(self.screen)
+                pygame.display.flip()
+                self.run()
+            elif self.deathTime == 120 and self.numberLife == 0:
+                self.runDeath = False
+
+            self.deathTime += 1
+
             self.clock.tick(60)
 
 
