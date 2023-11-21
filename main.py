@@ -38,6 +38,8 @@ class Game:
         ]
         self.powerPelletSound = pygame.mixer.Sound("./data/power_pellet.wav")
         self.sirenGhost1 = pygame.mixer.Sound("./data/siren_1.wav")
+        self.introSound = pygame.mixer.Sound("./data/game_start.wav")
+        self.endLevelSound = pygame.mixer.Sound("./data/intermission.wav")
 
         self.ghostGoToHubSoundPlaying = False
         self.ghostFrightSoundPlaying = False
@@ -75,7 +77,7 @@ class Game:
         self.numberLife = 3
 
         self.pacman = Pacman()
-        self.pacmanSpeed = 1
+        self.pacmanSpeed = 2
         self.pacmanLife = 0
         self.pacmanWay = "Right"
         self.pacmanLastWay = "Right"
@@ -201,20 +203,12 @@ class Game:
             self.runDeath = True
             self.running = False
             self.runAfterDeath()
-            # self.pacman.setPos(108, 132)
-            # self.CollisionBox.x, self.CollisionBox.y = (
-            #     self.pacman.rect.x,
-            #     self.pacman.rect.y,
-            # )
-            # self.scoreBox.x, self.scoreBox.y = (
-            #     self.pacman.rect.x + 4,
-            #     self.pacman.rect.y + 4,
-            # )
         if (
-            self.pacman.rect.colliderect(self.blinky.rect)
+            self.scoreBox.colliderect(self.blinky.rect)
             and self.blinkyFright
             and not self.blinkyGoToHub
         ):
+            pygame.mixer.Sound.play(self.eatGhostSound)
             self.blinkyGoToHub = True
             self.score += 700
 
@@ -226,8 +220,9 @@ class Game:
             self.running = False
             self.runAfterDeath()
         if (
-            self.pacman.rect.colliderect(self.pinky.rect) and self.pinkyFright
+            self.scoreBox.colliderect(self.pinky.rect) and self.pinkyFright
         ) and not self.pinkyGoToHub:
+            pygame.mixer.Sound.play(self.eatGhostSound)
             self.pinkyGoToHub = True
             self.score += 700
 
@@ -239,10 +234,11 @@ class Game:
             self.running = False
             self.runAfterDeath()
         if (
-            self.pacman.rect.colliderect(self.inky.rect)
+            self.scoreBox.colliderect(self.inky.rect)
             and self.inkyFright
             and not self.inkyGoToHub
         ):
+            pygame.mixer.Sound.play(self.eatGhostSound)
             self.inkyGoToHub = True
             self.score += 700
 
@@ -254,10 +250,11 @@ class Game:
             self.running = False
             self.runAfterDeath()
         if (
-            self.pacman.rect.colliderect(self.clyde.rect)
+            self.scoreBox.colliderect(self.clyde.rect)
             and self.clydeFright
             and not self.clydeGoToHub
         ):
+            pygame.mixer.Sound.play(self.eatGhostSound)
             self.clydeGoToHub = True
             self.score += 700
 
@@ -375,11 +372,12 @@ class Game:
                         self.clyde.isScatter = False
                         self.timeFright = 420
                         self.score += 50
-                        self.ghostFrightSoundPlaying = True
-                        self.ghostGoToHubSoundPlaying = False
-                        pygame.mixer.Sound.stop(self.sirenGhost1)
-                        pygame.mixer.Sound.stop(self.ghostGoToHubSound)
-                        pygame.mixer.Sound.play(self.powerPelletSound, -1)
+                        if not self.ghostFrightSoundPlaying:
+                            self.ghostFrightSoundPlaying = True
+                            self.ghostGoToHubSoundPlaying = False
+                            pygame.mixer.Sound.stop(self.sirenGhost1)
+                            pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+                            pygame.mixer.Sound.play(self.powerPelletSound, -1)
         self.group.draw(self.screen)
 
     def addScore(self):
@@ -396,6 +394,15 @@ class Game:
                         pygame.mixer.Sound.play(self.munchSound[self.numberGom % 2])
                         self.numberGom += 1
                         self.score += gommeOnScreen.score
+
+                for gommeOnScreen in self.gommes:
+                    if (
+                        gommeOnScreen.rect.x == gomme.x
+                        and gommeOnScreen.rect.y == gomme.y
+                    ):
+                        if gommeOnScreen in self.gommes:
+                            self.gommes.remove(gommeOnScreen)
+        print(self.gommes)
         self.group.update()
         self.group.draw(self.screen)
 
@@ -1792,6 +1799,12 @@ class Game:
         pygame.display.flip()
         pygame.display.update()
 
+    def intro(self):
+        pygame.mixer.Sound.play(self.introSound)
+        self.updateScreen()
+        sleep(3.5)
+        self.run()
+
     def run(self) -> None:
         pygame.mixer.Sound.play(self.sirenGhost1, -1)
         self.sirenPlaying = True
@@ -1896,8 +1909,12 @@ class Game:
             else:
                 self.timeFright -= 1
 
+            if self.gommes == []:
+                self.endLevel()
+                self.running = False
+
             self.updateScreen()
-            self.clock.tick(60)
+            self.clock.tick(30)
 
     def runAfterDeath(self):
         pygame.mixer.Sound.stop(self.sirenGhost1)
@@ -1952,7 +1969,7 @@ class Game:
                     self.pacman.rect.x + 4,
                     self.pacman.rect.y + 4,
                 )
-                self.pacmanSpeed = 1
+                self.pacmanSpeed = 2
                 self.pacmanLife = 0
                 self.pacmanWay = "Right"
                 self.pacmanLastWay = "Right"
@@ -2017,15 +2034,33 @@ class Game:
                 self.group.update()
                 self.group.draw(self.screen)
                 pygame.display.flip()
-                self.run()
+                self.intro()
             elif self.deathTime == 120 and self.numberLife <= 0:
                 self.runDeath = False
+                self.run = False
 
             self.deathTime += 1
 
             self.clock.tick(60)
 
+    def endLevel(self):
+        pygame.mixer.Sound.stop(self.sirenGhost1)
+        pygame.mixer.Sound.stop(self.powerPelletSound)
+        pygame.mixer.Sound.stop(self.ghostGoToHubSound)
+        pygame.mixer.Sound.play(self.endLevelSound)
+        self.group.remove(self.blinky)
+        self.group.update()
+        self.group.remove(self.pinky)
+        self.group.update()
+        self.group.remove(self.inky)
+        self.group.update()
+        self.group.remove(self.clyde)
+        self.group.update()
+        self.group.draw(self.screen)
+        pygame.display.update()
+        sleep(5)
+
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    game.intro()
