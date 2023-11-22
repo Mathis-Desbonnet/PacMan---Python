@@ -11,55 +11,55 @@ class Pacman(pygame.sprite.Sprite):
             .subsurface((18, 0, 16, 16))
         )
         self.rect = self.image.get_rect()
-        self.rect.x = 108
-        self.rect.y = 132
+        self.rect.x = 104
+        self.rect.y = 180
 
         self.frameUp = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((34, 32, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((2, 32, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((18, 32, 16, 16)),
-            pygame.image.load("./data/PacManSprites.png")
-            .convert_alpha()
-            .subsurface((34, 32, 16, 16)),
         ]
 
         self.frameLeft = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((34, 16, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((2, 16, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((18, 16, 16, 16)),
-            pygame.image.load("./data/PacManSprites.png")
-            .convert_alpha()
-            .subsurface((34, 16, 16, 16)),
         ]
 
         self.frameDown = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((34, 48, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((2, 48, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((18, 48, 16, 16)),
-            pygame.image.load("./data/PacManSprites.png")
-            .convert_alpha()
-            .subsurface((34, 48, 16, 16)),
         ]
 
         self.frameRight = [
+            pygame.image.load("./data/PacManSprites.png")
+            .convert_alpha()
+            .subsurface((34, 0, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((2, 0, 16, 16)),
             pygame.image.load("./data/PacManSprites.png")
             .convert_alpha()
             .subsurface((18, 0, 16, 16)),
-            pygame.image.load("./data/PacManSprites.png")
-            .convert_alpha()
-            .subsurface((34, 0, 16, 16)),
         ]
 
         self.frameDeath = [

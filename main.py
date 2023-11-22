@@ -86,39 +86,33 @@ class Game:
         self.pinkyDirectionAddition = (32, 0)
         self.inkyDirectionAddition = (16, 0)
 
-        self.blinky = Blinky(x=108, y=108)
+        self.blinky = Blinky(x=104, y=84)
         self.blinkyLife = 0
         self.blinkyCheck = 0
         self.blinkyGoToHub = False
         self.blinkyFright = False
-        self.blinkyPossibleDirection = "Up"
+        self.blinkyPossibleDirection = "Right"
 
-        self.pinky = Pinky(x=92, y=108)
+        self.pinky = Pinky(x=104, y=108)
         self.pinkyLife = 0
         self.pinkyCheck = 0
         self.pinkyGoToHub = False
         self.pinkyFright = False
         self.pinkyPossibleDirection = "Up"
 
-        self.inky = Inky(x=108, y=84)
+        self.inky = Inky(x=88, y=108)
         self.inkyLife = 0
         self.inkyCheck = 0
         self.inkyGoToHub = False
         self.inkyFright = False
         self.inkyPossibleDirection = "Right"
 
-        self.clyde = Clyde(x=92, y=84)
+        self.clyde = Clyde(x=120, y=108)
         self.clydeLife = 0
         self.clydeCheck = 0
         self.clydeGoToHub = False
         self.clydeFright = False
         self.clydePossibleDirection = "Right"
-
-        self.group.add(self.blinky)
-        self.group.add(self.pinky)
-        self.group.add(self.inky)
-        self.group.add(self.clyde)
-        self.group.add(self.pacman)
 
         self.CollisionBox = pygame.Rect(self.pacman.rect.x, self.pacman.rect.y, 16, 16)
         self.scoreBox = pygame.Rect(
@@ -175,6 +169,18 @@ class Game:
         for gomme in self.gommePlusSpawn:
             self.gommesPlus.append(GommePlus(x=gomme.x, y=gomme.y))
             self.group.add(GommePlus(x=gomme.x, y=gomme.y))
+
+        self.group.add(self.blinky)
+        self.group.add(self.pinky)
+        self.group.add(self.inky)
+        self.group.add(self.clyde)
+        self.group.add(self.pacman)
+
+        self.group.change_layer(self.blinky, 1000)
+        self.group.change_layer(self.pinky, 1000)
+        self.group.change_layer(self.inky, 1000)
+        self.group.change_layer(self.clyde, 1000)
+        self.group.change_layer(self.pacman, 1000)
 
     def checkCollision(self):
         ifCollision = False
@@ -402,13 +408,13 @@ class Game:
                     ):
                         if gommeOnScreen in self.gommes:
                             self.gommes.remove(gommeOnScreen)
-        print(self.gommes)
         self.group.update()
         self.group.draw(self.screen)
 
     def blinkyMovement(self):
-        if self.blinkyLife <= 23:
-            self.blinky.move(0, -1)
+        if self.blinkyLife <= 3:
+            self.blinky.move(1, 0)
+            self.blinkyCheck = 8
         else:
             if (self.blinkyFright and self.blinkyCheck >= 8) and not self.blinkyGoToHub:
                 self.blinkyCheck = 0
@@ -508,6 +514,8 @@ class Game:
                 self.gameState == "Chase" or self.blinky.isScatter or self.blinkyGoToHub
             ) and self.blinkyCheck >= 8:
                 # print("MODDDIIIIIIFFFFYY")
+                # print(self.blinky.rect.x, self.blinky.rect.y)
+                # print()
                 min = 1000000000000000000000
                 self.blinkyCheck = 0
                 for i in self.blinky.okMovement:
@@ -665,7 +673,7 @@ class Game:
                             self.blinkyPossibleDirection = "Up"
                         self.blinky.moveCollisionBox(0, 8)
 
-            if self.blinkyLife >= 24:
+            if self.blinkyLife >= 0:
                 if self.blinkyPossibleDirection == "Right":
                     self.blinky.move(1, 0)
                     if self.blinky.rect.colliderect(self.ghostCollisionRight):
@@ -703,10 +711,26 @@ class Game:
                 self.blinky.isScatter = True
 
     def pinkyMovement(self):
-        if self.pinkyLife <= 7:
-            self.pinky.move(1, 0)
-        elif self.pinkyLife <= 31:
+        if self.pinkyLife <= 4:
+            self.pinky.move(0, 1)
+            self.pinkyLoop = 0
+            self.pinkyLoopDown = False
+        elif self.pinkyLife <= 183:
+            if self.pinkyLoopDown:
+                self.pinky.move(0, 1)
+            else:
+                self.pinky.move(0, -1)
+
+            self.pinkyLoop += 1
+
+            if self.pinkyLoop >= 9:
+                self.pinkyLoopDown = not self.pinkyLoopDown
+                self.pinkyLoop = 0
+
+        elif self.pinkyLife <= 211:
             self.pinky.move(0, -1)
+        elif self.pinkyLife <= 215:
+            self.pinky.move(-1, 0)
         else:
             if (self.pinkyFright and self.pinkyCheck >= 8) and not self.pinkyGoToHub:
                 self.pinkyCheck = 0
@@ -989,7 +1013,7 @@ class Game:
                             self.pinkyPossibleDirection = "Up"
                         self.pinky.moveCollisionBox(0, 8)
 
-            if self.pinkyLife >= 32:
+            if self.pinkyLife >= 27:
                 if self.pinkyPossibleDirection == "Right":
                     if self.pinky.collisionBox.colliderect(self.ghostCollisionRight):
                         self.pinky.setPos(-19, 108)
@@ -1027,7 +1051,39 @@ class Game:
                 self.pinky.isScatter = True
 
     def inkyMovement(self):
-        if self.inkyLife >= 0:
+        if self.inkyLife <= 4:
+            self.inky.move(0, -1)
+            self.inkyLoop = 0
+            self.inkyLoopDown = True
+        elif self.inkyLife <= 219:
+            if self.inkyLoopDown:
+                self.inky.move(0, 1)
+            else:
+                self.inky.move(0, -1)
+
+            self.inkyLoop += 1
+
+            if self.inkyLoop >= 9:
+                self.inkyLoopDown = not self.inkyLoopDown
+                self.inkyLoop = 0
+
+        elif self.inkyLife <= 223:
+            print(self.inky.rect.x, self.inky.rect.y)
+            print()
+            self.inky.move(0, 1)
+        elif self.inkyLife <= 239:
+            print(self.inky.rect.x, self.inky.rect.y)
+            print()
+            self.inky.move(1, 0)
+        elif self.inkyLife <= 263:
+            print(self.inky.rect.x, self.inky.rect.y)
+            print()
+            self.inky.move(0, -1)
+        elif self.inkyLife <= 267:
+            print(self.inky.rect.x, self.inky.rect.y)
+            print()
+            self.inky.move(1, 0)
+        else:
             if (self.inkyFright and self.inkyCheck >= 8) and not self.inkyGoToHub:
                 self.inkyCheck = 0
                 if self.inky.firstFright:
@@ -1110,6 +1166,9 @@ class Game:
             elif (
                 self.gameState == "Chase" or self.inky.isScatter or self.inkyGoToHub
             ) and self.inkyCheck >= 8:
+                print("modifyy")
+                print(self.inky.rect.x, self.inky.rect.y)
+                print()
                 min = 1000000000000000000000
                 self.inkyCheck = 0
                 xDistance = self.blinky.getPos()[0] - (
@@ -1303,7 +1362,39 @@ class Game:
                 self.inky.isScatter = True
 
     def clydeMovement(self):
-        if self.clydeLife >= 0:
+        if self.clydeLife <= 4:
+            self.clyde.move(0, -1)
+            self.clydeLoop = 0
+            self.clydeLoopDown = True
+        elif self.clydeLife <= 255:
+            if self.clydeLoopDown:
+                self.clyde.move(0, 1)
+            else:
+                self.clyde.move(0, -1)
+
+            self.clydeLoop += 1
+
+            if self.clydeLoop >= 9:
+                self.clydeLoopDown = not self.clydeLoopDown
+                self.clydeLoop = 0
+
+        elif self.clydeLife <= 259:
+            print(self.clyde.rect.x, self.clyde.rect.y)
+            print()
+            self.clyde.move(0, 1)
+        elif self.clydeLife <= 275:
+            print(self.clyde.rect.x, self.clyde.rect.y)
+            print()
+            self.clyde.move(-1, 0)
+        elif self.clydeLife <= 299:
+            print(self.clyde.rect.x, self.clyde.rect.y)
+            print()
+            self.clyde.move(0, -1)
+        elif self.clydeLife <= 303:
+            print(self.clyde.rect.x, self.clyde.rect.y)
+            print()
+            self.clyde.move(-1, 0)
+        else:
             min = 1000000000000000000000
             if (self.clydeFright and self.clydeCheck >= 8) and not self.clydeGoToHub:
                 self.clydeCheck = 0
@@ -1960,7 +2051,7 @@ class Game:
                 self.runDeath = False
                 self.running = True
                 self.deathTime = 0
-                self.pacman.setPos(108, 132)
+                self.pacman.setPos(104, 180)
                 self.CollisionBox.x, self.CollisionBox.y = (
                     self.pacman.rect.x,
                     self.pacman.rect.y,
@@ -1978,7 +2069,7 @@ class Game:
                 self.pinkyDirectionAddition = (32, 0)
                 self.inkyDirectionAddition = (16, 0)
 
-                self.blinky.setPos(108, 108)
+                self.blinky.setPos(104, 84)
                 self.blinkyLife = 0
                 self.blinkyCheck = 0
                 self.blinkyGoToHub = False
@@ -1990,7 +2081,7 @@ class Game:
                 self.blinky.bugCounter = 0
                 self.blinky.okMovement = ["Right", "Left", "Up"]
 
-                self.pinky.setPos(92, 108)
+                self.pinky.setPos(104, 108)
                 self.pinkyLife = 0
                 self.pinkyCheck = 0
                 self.pinkyGoToHub = False
@@ -2002,7 +2093,7 @@ class Game:
                 self.pinky.bugCounter = 0
                 self.pinky.okMovement = ["Right", "Left", "Up"]
 
-                self.inky.setPos(108, 84)
+                self.inky.setPos(88, 108)
                 self.inkyLife = 0
                 self.inkyCheck = 0
                 self.inkyGoToHub = False
@@ -2014,7 +2105,7 @@ class Game:
                 self.inky.bugCounter = 0
                 self.inky.okMovement = ["Right", "Left", "Up"]
 
-                self.clyde.setPos(92, 84)
+                self.clyde.setPos(120, 108)
                 self.clydeLife = 0
                 self.clydeCheck = 0
                 self.clydeGoToHub = False
