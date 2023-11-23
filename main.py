@@ -5,7 +5,7 @@ import pygame
 import pytmx
 import pyscroll
 from player import Pacman
-from item import Gomme, GommePlus
+from item import Gomme, GommePlus, Cherry
 from blinky import Blinky
 from pinky import Pinky
 from inky import Inky
@@ -122,6 +122,12 @@ class Game:
         self.running = True
         self.score = 0
         self.numberGom = 0
+        self.level = 0
+
+        self.listFruit = [Cherry(x=104, y=132)]
+        self.fruitSpawn = False
+        self.fruitTime = 210
+        self.numberFruit = 0
 
         self.collisions = []
         self.collisionHub = None
@@ -410,6 +416,35 @@ class Game:
                             self.gommes.remove(gommeOnScreen)
         self.group.update()
         self.group.draw(self.screen)
+
+        if self.fruitSpawn:
+            if self.scoreBox.colliderect(self.listFruit[self.level]):
+                self.group.remove(self.listFruit[self.level])
+                self.group.update()
+                self.score += self.listFruit[self.level].score
+                self.fruitSpawn = False
+
+    def spawnFruit(self):
+        if self.fruitSpawn:
+            self.fruitTime -= 1
+
+        if len(self.gommes) <= 170 and not self.fruitSpawn and self.numberFruit == 0:
+            self.group.add(self.listFruit[self.level])
+            self.group.update()
+            self.fruitSpawn = True
+            self.numberFruit += 1
+
+        if len(self.gommes) <= 70 and not self.fruitSpawn and self.numberFruit == 1:
+            self.group.add(self.listFruit[self.level])
+            self.group.update()
+            self.fruitSpawn = True
+            self.numberFruit += 1
+
+        if self.fruitSpawn and self.fruitTime <= 0:
+            self.fruitSpawn = False
+            self.fruitTime = 210
+            self.group.remove(self.listFruit[self.level])
+            self.group.update()
 
     def blinkyMovement(self):
         if self.blinkyLife <= 3:
@@ -1908,6 +1943,7 @@ class Game:
             self.input()
             self.addScore()
             self.setState()
+            self.spawnFruit()
 
             self.checkSpriteCollision()
 
