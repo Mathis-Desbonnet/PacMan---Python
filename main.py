@@ -524,8 +524,8 @@ class Game:
                         self.blinky.moveCollisionBox(8, 0)
                         if self.blinkyGoToHub:
                             self.blinkyDistance = sqrt(
-                                (self.blinky.collisionBox.x - 108) ** 2
-                                + (self.blinky.collisionBox.y - 108) ** 2
+                                (self.blinky.collisionBox.x - 104) ** 2
+                                + (self.blinky.collisionBox.y - 84) ** 2
                             )
                         elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
@@ -562,8 +562,8 @@ class Game:
                         self.blinky.moveCollisionBox(0, 8)
                         if self.blinkyGoToHub:
                             self.blinkyDistance = sqrt(
-                                (self.blinky.collisionBox.x - 108) ** 2
-                                + (self.blinky.collisionBox.y - 108) ** 2
+                                (self.blinky.collisionBox.x - 104) ** 2
+                                + (self.blinky.collisionBox.y - 84) ** 2
                             )
                         elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
@@ -600,8 +600,8 @@ class Game:
                         self.blinky.moveCollisionBox(-8, 0)
                         if self.blinkyGoToHub:
                             self.blinkyDistance = sqrt(
-                                (self.blinky.collisionBox.x - 108) ** 2
-                                + (self.blinky.collisionBox.y - 108) ** 2
+                                (self.blinky.collisionBox.x - 104) ** 2
+                                + (self.blinky.collisionBox.y - 84) ** 2
                             )
                         elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
@@ -638,8 +638,8 @@ class Game:
                         self.blinky.moveCollisionBox(0, -8)
                         if self.blinkyGoToHub:
                             self.blinkyDistance = sqrt(
-                                (self.blinky.collisionBox.x - 108) ** 2
-                                + (self.blinky.collisionBox.y - 108) ** 2
+                                (self.blinky.collisionBox.x - 104) ** 2
+                                + (self.blinky.collisionBox.y - 84) ** 2
                             )
                         elif self.blinky.isScatter:
                             self.blinkyDistance = sqrt(
@@ -698,15 +698,15 @@ class Game:
                     )
 
             if (
-                self.blinky.rect.x == 108
-                and self.blinky.rect.y == 108
+                self.blinky.rect.x == 104
+                and self.blinky.rect.y == 84
                 and self.blinkyGoToHub
             ):
                 self.blinkyGoToHub = False
-                self.blinky.setPos(108, 107)
+                self.blinky.setPos(105, 84)
                 self.blinkyLife = 0
                 self.blinkyCheck = 0
-                self.blinkyPossibleDirection = "Up"
+                self.blinkyPossibleDirection = "Right"
                 self.blinkyFright = False
                 self.blinky.isScatter = True
 
@@ -820,7 +820,7 @@ class Game:
                         self.pinky.moveCollisionBox(8, 0)
                         if self.pinkyGoToHub:
                             self.pinkyDistance = sqrt(
-                                (self.pinky.collisionBox.x - 92) ** 2
+                                (self.pinky.collisionBox.x - 104) ** 2
                                 + (self.pinky.collisionBox.y - 108) ** 2
                             )
                         elif self.pinky.isScatter:
@@ -869,7 +869,7 @@ class Game:
                         self.pinky.moveCollisionBox(0, 8)
                         if self.pinkyGoToHub:
                             self.pinkyDistance = sqrt(
-                                (self.pinky.collisionBox.x - 92) ** 2
+                                (self.pinky.collisionBox.x - 104) ** 2
                                 + (self.pinky.collisionBox.y - 108) ** 2
                             )
                         elif self.pinky.isScatter:
@@ -918,7 +918,7 @@ class Game:
                         self.pinky.moveCollisionBox(-8, 0)
                         if self.pinkyGoToHub:
                             self.pinkyDistance = sqrt(
-                                (self.pinky.collisionBox.x - 92) ** 2
+                                (self.pinky.collisionBox.x - 104) ** 2
                                 + (self.pinky.collisionBox.y - 108) ** 2
                             )
                         elif self.pinky.isScatter:
@@ -967,7 +967,7 @@ class Game:
                         self.pinky.moveCollisionBox(0, -8)
                         if self.pinkyGoToHub:
                             self.pinkyDistance = sqrt(
-                                (self.pinky.collisionBox.x - 92) ** 2
+                                (self.pinky.collisionBox.x - 104) ** 2
                                 + (self.pinky.collisionBox.y - 108) ** 2
                             )
                         elif self.pinky.isScatter:
@@ -1038,12 +1038,12 @@ class Game:
                     )
 
             if (
-                self.pinky.rect.x == 92
+                self.pinky.rect.x == 104
                 and self.pinky.rect.y == 108
                 and self.pinkyGoToHub
             ):
                 self.pinkyGoToHub = False
-                self.pinky.setPos(93, 108)
+                self.pinky.setPos(104, 109)
                 self.pinkyLife = 0
                 self.pinkyCheck = 0
                 self.pinkyPossibleDirection = "Up"
@@ -1068,20 +1068,20 @@ class Game:
                 self.inkyLoop = 0
 
         elif self.inkyLife <= 223:
-            print(self.inky.rect.x, self.inky.rect.y)
-            print()
+            # print(self.inky.rect.x, self.inky.rect.y)
+            # print()
             self.inky.move(0, 1)
         elif self.inkyLife <= 239:
-            print(self.inky.rect.x, self.inky.rect.y)
-            print()
+            # print(self.inky.rect.x, self.inky.rect.y)
+            # print()
             self.inky.move(1, 0)
         elif self.inkyLife <= 263:
-            print(self.inky.rect.x, self.inky.rect.y)
-            print()
+            #     print(self.inky.rect.x, self.inky.rect.y)
+            #     print()
             self.inky.move(0, -1)
         elif self.inkyLife <= 267:
-            print(self.inky.rect.x, self.inky.rect.y)
-            print()
+            # print(self.inky.rect.x, self.inky.rect.y)
+            # print()
             self.inky.move(1, 0)
         else:
             if (self.inkyFright and self.inkyCheck >= 8) and not self.inkyGoToHub:
@@ -1189,8 +1189,8 @@ class Game:
                         self.inky.moveCollisionBox(8, 0)
                         if self.inkyGoToHub:
                             self.inkyDistance = sqrt(
-                                (self.inky.collisionBox.x - 108) ** 2
-                                + (self.inky.collisionBox.y - 84) ** 2
+                                (self.inky.collisionBox.x - 88) ** 2
+                                + (self.inky.collisionBox.y - 108) ** 2
                             )
                         elif self.inky.isScatter:
                             self.inkyDistance = sqrt(
@@ -1225,8 +1225,8 @@ class Game:
                         # pygame.display.flip()
                         if self.inkyGoToHub:
                             self.inkyDistance = sqrt(
-                                (self.inky.collisionBox.x - 108) ** 2
-                                + (self.inky.collisionBox.y - 84) ** 2
+                                (self.inky.collisionBox.x - 88) ** 2
+                                + (self.inky.collisionBox.y - 108) ** 2
                             )
                         elif self.inky.isScatter:
                             self.inkyDistance = sqrt(
@@ -1259,8 +1259,8 @@ class Game:
                         # pygame.display.flip()
                         if self.inkyGoToHub:
                             self.inkyDistance = sqrt(
-                                (self.inky.collisionBox.x - 108) ** 2
-                                + (self.inky.collisionBox.y - 84) ** 2
+                                (self.inky.collisionBox.x - 88) ** 2
+                                + (self.inky.collisionBox.y - 108) ** 2
                             )
                         elif self.inky.isScatter:
                             self.inkyDistance = sqrt(
@@ -1294,8 +1294,8 @@ class Game:
                         # pygame.display.flip()
                         if self.inkyGoToHub:
                             self.inkyDistance = sqrt(
-                                (self.inky.collisionBox.x - 108) ** 2
-                                + (self.inky.collisionBox.y - 84) ** 2
+                                (self.inky.collisionBox.x - 88) ** 2
+                                + (self.inky.collisionBox.y - 108) ** 2
                             )
                         elif self.inky.isScatter:
                             self.inkyDistance = sqrt(
@@ -1352,9 +1352,9 @@ class Game:
                         + self.inky.allMovement.copy()[2:4]
                     )
 
-            if self.inky.rect.x == 108 and self.inky.rect.y == 84 and self.inkyGoToHub:
+            if self.inky.rect.x == 88 and self.inky.rect.y == 108 and self.inkyGoToHub:
                 self.inkyGoToHub = False
-                self.inky.setPos(108, 83)
+                self.inky.setPos(88, 107)
                 self.inkyLife = 0
                 self.inkyCheck = 0
                 self.inkyPossibleDirection = "Up"
@@ -1379,20 +1379,20 @@ class Game:
                 self.clydeLoop = 0
 
         elif self.clydeLife <= 259:
-            print(self.clyde.rect.x, self.clyde.rect.y)
-            print()
+            # print(self.clyde.rect.x, self.clyde.rect.y)
+            # print()
             self.clyde.move(0, 1)
         elif self.clydeLife <= 275:
-            print(self.clyde.rect.x, self.clyde.rect.y)
-            print()
+            # print(self.clyde.rect.x, self.clyde.rect.y)
+            # print()
             self.clyde.move(-1, 0)
         elif self.clydeLife <= 299:
-            print(self.clyde.rect.x, self.clyde.rect.y)
-            print()
+            # print(self.clyde.rect.x, self.clyde.rect.y)
+            # print()
             self.clyde.move(0, -1)
         elif self.clydeLife <= 303:
-            print(self.clyde.rect.x, self.clyde.rect.y)
-            print()
+            # print(self.clyde.rect.x, self.clyde.rect.y)
+            # print()
             self.clyde.move(-1, 0)
         else:
             min = 1000000000000000000000
@@ -1483,8 +1483,8 @@ class Game:
                         self.clyde.moveCollisionBox(8, 0)
                         if self.clydeGoToHub:
                             self.clydeDistance = sqrt(
-                                (self.clyde.collisionBox.x - 92) ** 2
-                                + (self.clyde.collisionBox.y - 84) ** 2
+                                (self.clyde.collisionBox.x - 120) ** 2
+                                + (self.clyde.collisionBox.y - 108) ** 2
                             )
                         elif self.clyde.isScatter:
                             self.clydeDistance = sqrt(
@@ -1540,8 +1540,8 @@ class Game:
                         self.clyde.moveCollisionBox(0, 8)
                         if self.clydeGoToHub:
                             self.clydeDistance = sqrt(
-                                (self.clyde.collisionBox.x - 92) ** 2
-                                + (self.clyde.collisionBox.y - 84) ** 2
+                                (self.clyde.collisionBox.x - 120) ** 2
+                                + (self.clyde.collisionBox.y - 108) ** 2
                             )
                         elif self.clyde.isScatter:
                             self.clydeDistance = sqrt(
@@ -1597,8 +1597,8 @@ class Game:
                         self.clyde.moveCollisionBox(-8, 0)
                         if self.clydeGoToHub:
                             self.clydeDistance = sqrt(
-                                (self.clyde.collisionBox.x - 92) ** 2
-                                + (self.clyde.collisionBox.y - 84) ** 2
+                                (self.clyde.collisionBox.x - 120) ** 2
+                                + (self.clyde.collisionBox.y - 108) ** 2
                             )
                         elif self.clyde.isScatter:
                             self.clydeDistance = sqrt(
@@ -1654,8 +1654,8 @@ class Game:
                         self.clyde.moveCollisionBox(0, -8)
                         if self.clydeGoToHub:
                             self.clydeDistance = sqrt(
-                                (self.clyde.collisionBox.x - 92) ** 2
-                                + (self.clyde.collisionBox.y - 84) ** 2
+                                (self.clyde.collisionBox.x - 120) ** 2
+                                + (self.clyde.collisionBox.y - 108) ** 2
                             )
                         elif self.clyde.isScatter:
                             self.clydeDistance = sqrt(
@@ -1738,12 +1738,12 @@ class Game:
                     )
 
             if (
-                self.clyde.rect.x == 92
-                and self.clyde.rect.y == 84
+                self.clyde.rect.x == 120
+                and self.clyde.rect.y == 108
                 and self.clydeGoToHub
             ):
                 self.clydeGoToHub = False
-                self.clyde.setPos(92, 83)
+                self.clyde.setPos(120, 107)
                 self.clydeLife = 0
                 self.clydeCheck = 0
                 self.clydePossibleDirection = "Up"
